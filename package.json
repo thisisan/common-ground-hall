@@ -1,0 +1,19 @@
+{
+  "name": "common-ground-hall-wall",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:pages": "node scripts/build-pages.mjs",
+    "start": "node scripts/serve.mjs",
+    "test": "node --test tests/feed.test.mjs && playwright test"
+  },
+  "devDependencies": {
+    "@dicebear/core": "10.6.0",
+    "@dicebear/styles": "10.6.0",
+    "@playwright/test": "^1.58.2",
+    "esbuild": "^0.28.2",
+    "qrcode": "^1.5.4"
+  }
+}
