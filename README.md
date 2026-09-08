@@ -8,7 +8,7 @@ Public site: https://thisisan.github.io/common-ground-hall/
 
 Source repository: https://github.com/thisisan/common-ground-hall
 
-GitHub Pages serves the committed `docs/` folder on `main`. To publish changes, run `npm ci && npm run build:pages`, commit the updated source and `docs/`, then push to `main`. It uses sample residents until the Google Form and Apps Script setup below is complete. Only the hall site is included in its public repository.
+GitHub Pages serves the committed `docs/` folder on `main`. To publish changes, run `npm ci && npm run build:pages`, commit the updated source and `docs/`, then push to `main`. It uses sample residents until an omg.dev backend or the optional Google Sheets feed is connected. Only the hall site is included in its public repository.
 
 Verify the deployed page with `SITE_URL=https://thisisan.github.io/common-ground-hall/ node scripts/check-live.mjs`. The check exercises the actual hosted site and saves `evidence/hosted-desktop.png`.
 
@@ -27,15 +27,21 @@ Open http://localhost:4173. Deploy `dist/index.html` to any static web host. The
 
 - Responsive resident wall with course filters and name/skill/interest search.
 - Full profile dialog, Instagram links, keyboard controls, and reduced-motion support.
-- Sample join form with 16 selectable Notionists avatars, consent, and browser-local persistence. Sample profiles are explicitly labeled and are not shared with other visitors.
-- Live join button opens your Google Form, with a real QR code for that form.
+- Join form with a full Avatartion editor, Instagram, XHS and LinkedIn fields, and consent. Without a connected backend it uses clearly labeled browser-local persistence. Sample profiles are explicitly labeled and are not shared with other visitors.
+- Join opens the resident form for a connected backend, or an optional Google Form. A QR code links residents to the form.
 - **Refresh wall is the only action that requests the feed.** No fetch on load, settings save, timer, focus, or display-mode entry. Reloading a live wall starts empty until Refresh wall is pressed. Feed failures preserve the currently displayed profiles.
 - Refresh reflects approvals, edits, and removals; repeated refreshes do not append duplicates. Changing feeds clears the previous feed's profiles and cancels its pending request.
 - Display mode shows four profiles per page (two on smaller screens), rotating every 12 seconds. Pause/Resume and Exit buttons. It cycles the current data only. Reduced-motion preference pauses rotation initially.
 
-## Google Form → Google Sheet → Refresh wall
+## Stored submissions and admin board
 
-No webhook, paid integration, or separate database is needed. Google Forms writes to the response Sheet; Apps Script exposes approved rows as JSON when the organizer clicks Refresh wall.
+The built-in form can now store profiles through an omg.dev backend, with a password-protected admin board for Pending, Published and Archived cards. Admins can edit details, feature profiles, publish, archive, restore, or permanently delete with explicit confirmation. Profile visibility on the public wall remains manual-refresh only. See [DEPLOY-OMG.md](DEPLOY-OMG.md) for deployment, storage, authentication and the current hosting-login blocker.
+
+**Avatar studio** uses the actual [Avatartion](https://github.com/wilmerterrero/Avatartion) artwork: face, hair, eyes, mouth, outfit, accessories, facial hair and backgrounds, with shuffle and SVG download. The original MIT license is included in `vendor/avatartion/LICENSE.txt`.
+
+## Optional Google Form → Google Sheet → Refresh wall
+
+The previous Google Sheets input remains available as an alternative to the omg.dev backend. Google Forms writes to the response Sheet; Apps Script exposes approved rows as JSON when the organizer clicks Refresh wall.
 
 1. Create a Google Form. Add these question titles **exactly**, then connect its Responses tab to a Google Sheet:
 

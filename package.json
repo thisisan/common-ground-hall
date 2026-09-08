@@ -6,14 +6,24 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "build:pages": "node scripts/build-pages.mjs",
+    "build:backend": "bun node_modules/@omg-dev/vite-plugin/src/build.ts",
+    "start:backend": "bun scripts/serve-backend.ts",
+    "test:backend": "bun test tests/backend.test.ts",
     "start": "node scripts/serve.mjs",
     "test": "node --test tests/feed.test.mjs && playwright test"
+  },
+  "dependencies": {
+    "@omg-dev/schema": "0.4.43",
+    "@omg-dev/server": "0.4.43"
   },
   "devDependencies": {
     "@dicebear/core": "10.6.0",
     "@dicebear/styles": "10.6.0",
+    "@omg-dev/vite-plugin": "0.4.43",
     "@playwright/test": "^1.58.2",
     "esbuild": "^0.28.2",
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "vite": "^7.3.1",
+    "vite-plus": "^0.3.0"
   }
 }

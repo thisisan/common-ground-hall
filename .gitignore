@@ -2,3 +2,11 @@ node_modules/
 dist/
 test-results/
 playwright-report/
+.vibes/
+.omg/
+.env*
+*.db
+*.db-wal
+*.db-shm
+src/db.generated.ts
+src/db.drizzle.ts

@@ -1,3 +1,5 @@
+import { cleanAvatar } from './avatar-schema.js';
+import { socialURL } from './profile-schema.js';
 export const categories = ['Arts & Design', 'Business', 'Engineering', 'Science', 'Other'];
 export const sampleProfiles = [
   { id: 'demo-1', name: 'Alex Chan', curriculum: 'Architecture', category: 'Arts & Design', year: 'Year 2', intro: 'Sketchbook always in hand. Usually hunting down the best milk tea.', help: 'Sketching, Adobe tools & late-night model making.', meet: 'Creative souls and weekend café explorers.', handle: 'alex.sketches', avatar: 0 },
@@ -30,12 +32,21 @@ export function normalizeProfiles(payload) {
     clean.avatar = Number.isInteger(Number(profile.avatar)) && Number(profile.avatar) >= 0 ? Number(profile.avatar) % 16 : index % 16;
     clean.handle = clean.handle.replace(/^@/, '');
     if (!/^[A-Za-z0-9._]{1,30}$/.test(clean.handle)) clean.handle = '';
+    clean.xhs = socialURL(profile.xhs, 'xhs');
+    clean.linkedin = socialURL(profile.linkedin, 'linkedin');
+    clean.avatarConfig = cleanAvatar(profile.avatarConfig);
     return clean;
   });
 }
 
 export function validateSettings(settings) {
-  const result = { hallName: String(settings.hallName || 'Common Ground').trim().slice(0, 60), feedUrl: '', formUrl: '' };
+  const result = { hallName: String(settings.hallName || 'Common Ground').trim().slice(0, 60), feedUrl: '', formUrl: '', backendUrl: '' };
+  if (settings.backendUrl) {
+    let url; try { url = new URL(String(settings.backendUrl).trim()); } catch { throw new Error('Enter a valid omg.dev backend URL.'); }
+    const local = ['localhost', '127.0.0.1'].includes(url.hostname);
+    if ((!local && (url.protocol !== 'https:' || !url.hostname.endsWith('.omgs.app'))) || (local && !['http:', 'https:'].includes(url.protocol)) || url.username || url.password || url.search || url.hash) throw new Error('Use your https://…omgs.app backend URL.');
+    result.backendUrl = url.origin;
+  }
   for (const key of ['feedUrl', 'formUrl']) {
     const value = String(settings[key] || '').trim();
     if (!value) continue;

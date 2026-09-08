@@ -1,0 +1,9 @@
+{
+  "repository": "thisisan/common-ground-hall",
+  "repository_url": "https://github.com/thisisan/common-ground-hall",
+  "site_url": "https://thisisan.github.io/common-ground-hall/",
+  "branch": "main",
+  "publish_directory": "/docs",
+  "build_command": "npm run build:pages",
+  "visibility": "public"
+}

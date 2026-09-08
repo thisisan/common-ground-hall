@@ -2,6 +2,10 @@ import QRCode from 'qrcode';
 import { sampleProfiles, normalizeProfiles, validateSettings } from './data.js';
 import avatars from './assets/avatars.json';
 import defaults from './config.json';
+import { avatarURI, randomAvatar, mountAvatarEditor } from './avatars.js';
+import { validateSubmission } from './profile-schema.js';
+import { createAPI } from './api.js';
+import { setupAdmin } from './admin.js';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -35,10 +39,16 @@ let settings;
 try { settings = validateSettings({ ...defaults, ...storage.get('settings', {}) }); } catch { settings = validateSettings(defaults); }
 let localProfiles;
 try { localProfiles = normalizeProfiles({ profiles: storage.get('samples', []) }); } catch { localProfiles = []; }
-let profiles = settings.feedUrl ? [] : [...localProfiles, ...sampleProfiles];
+if (!settings.backendUrl && (location.hostname.endsWith('.omgs.app') || (['localhost', '127.0.0.1'].includes(location.hostname) && location.port === '4174'))) settings.backendUrl = location.origin;
+const hasBackend = () => !!settings.backendUrl;
+const hasFeed = () => !!(settings.backendUrl || settings.feedUrl);
+const api = createAPI(() => settings.backendUrl);
+let profiles = hasFeed() ? [] : [...localProfiles, ...sampleProfiles];
 let filter = 'All';
 let query = '';
 let selectedAvatar = 0;
+let customAvatar = randomAvatar();
+let submissionId = crypto.randomUUID();
 let isFetching = false;
 let feedGeneration = 0;
 let activeRequest;
@@ -49,10 +59,17 @@ let displayPaused = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let displayTimer;
 let qrMarkup = '';
 
-function avatar(index) { return `<img src="${avatars[Math.abs(Number(index) || 0) % avatars.length]}" alt="" draggable="false">`; }
+function avatar(index, config = null) { return `<img src="${config ? avatarURI(config) : avatars[Math.abs(Number(index) || 0) % avatars.length]}" alt="" draggable="false">`; }
 function field(label, text, type) { return `<div class="profile-field">${icon(type)}<div><span class="field-label">${label}</span><p>${escape(text || 'A conversation waiting to happen.')}</p></div></div>`; }
+function socialLinks(profile) {
+  const links = [];
+  if (profile.handle) links.push(`<a class="social-chip" href="https://www.instagram.com/${encodeURIComponent(profile.handle)}/" target="_blank" rel="noopener noreferrer" aria-label="Find ${escape(profile.name)} on Instagram">IG <span>${escape(profile.xhs || profile.linkedin ? '' : '@' + profile.handle)}</span></a>`);
+  if (profile.xhs) links.push(`<a class="social-chip xhs" href="${escape(profile.xhs)}" target="_blank" rel="noopener noreferrer" aria-label="Find ${escape(profile.name)} on XHS">小红书</a>`);
+  if (profile.linkedin) links.push(`<a class="social-chip linkedin" href="${escape(profile.linkedin)}" target="_blank" rel="noopener noreferrer" aria-label="Find ${escape(profile.name)} on LinkedIn">in <span>LinkedIn</span></a>`);
+  return links.length ? `<div class="social-links">${links.join('')}</div>` : '<span class="handle">Say hello around the hall</span>';
+}
 function cardHTML(profile, detailed = false) {
-  return `<div class="portrait" style="--card-color:${colors[profile.avatar % colors.length]}"><span class="year-badge">${escape(profile.year || 'RESIDENT').toUpperCase()}</span><button class="open-profile" data-profile="${escape(profile.id)}" aria-label="Meet ${escape(profile.name)}">${icon('diagonal')}</button>${avatar(profile.avatar)}<span class="portrait-doodle" aria-hidden="true">${['✧', '✳', '〰', '✦'][profile.avatar % 4]}</span></div><div class="card-content"><h3${detailed ? ' id="profile-name"' : ''}>${escape(profile.name)}</h3><div class="course">${icon('book')}${escape(profile.curriculum || 'Hall resident')}</div><hr class="card-rule">${field('I AM', profile.intro, 'person')}${field('I CAN HELP WITH', profile.help, 'help')}${field('I WANT TO MEET', profile.meet, 'people')}</div><div class="card-footer">${profile.handle ? `<a class="handle" href="https://www.instagram.com/${encodeURIComponent(profile.handle)}/" target="_blank" rel="noopener noreferrer" aria-label="Find ${escape(profile.name)} on Instagram">${icon('send')}<span>@${escape(profile.handle)}</span></a>` : '<span class="handle">Say hello around the hall</span>'}<span class="hello-label">Open to a hello</span></div>`;
+  return `<div class="portrait" style="--card-color:${profile.avatarConfig?.background || colors[profile.avatar % colors.length]}"><span class="year-badge">${escape(profile.year || 'RESIDENT').toUpperCase()}</span><button class="open-profile" data-profile="${escape(profile.id)}" aria-label="Meet ${escape(profile.name)}">${icon('diagonal')}</button>${avatar(profile.avatar, profile.avatarConfig)}<span class="portrait-doodle" aria-hidden="true">${['✧', '✳', '〰', '✦'][profile.avatar % 4]}</span></div><div class="card-content"><h3${detailed ? ' id="profile-name"' : ''}>${escape(profile.name)}</h3><div class="course">${icon('book')}${escape(profile.curriculum || 'Hall resident')}</div><hr class="card-rule">${field('I AM', profile.intro, 'person')}${field('I CAN HELP WITH', profile.help, 'help')}${field('I WANT TO MEET', profile.meet, 'people')}</div><div class="card-footer">${socialLinks(profile)}<span class="hello-label">Open to a hello</span></div>`;
 }
 function filteredProfiles() {
   return profiles.filter(p => (filter === 'All' || p.category === filter) && (!query || [p.name, p.curriculum, p.intro, p.help, p.meet, p.handle, p.year].join(' ').toLowerCase().includes(query)));
@@ -68,9 +85,9 @@ function render() {
   $('#hero-count').textContent = `${profiles.length} ${profiles.length === 1 ? 'resident' : 'residents'}`;
   $('#result-line').textContent = !display && (query || filter !== 'All') ? `${filtered.length} ${filtered.length === 1 ? 'resident' : 'residents'} found${filter !== 'All' ? ` in ${filter}` : ''}` : '';
   $('#empty-state').hidden = !!visible.length;
-  if (!profiles.length && settings.feedUrl) {
+  if (!profiles.length && hasFeed()) {
     $('#empty-state h3').textContent = 'Your hall is ready to meet.';
-    $('#empty-state p').textContent = 'Press Refresh wall to load approved profiles from your Google Sheet.';
+    $('#empty-state p').textContent = 'Press Refresh wall to load approved resident profiles.';
     $('#reset-filters').hidden = true;
   } else {
     $('#empty-state h3').textContent = 'No familiar faces here. Yet.';
@@ -78,7 +95,7 @@ function render() {
     $('#reset-filters').hidden = false;
   }
   $('#display-page').textContent = `${displayPage + 1} / ${pages}`;
-  $('#mini-avatars').innerHTML = (profiles.length ? profiles.slice(0, 4) : sampleProfiles.slice(0, 4)).map(p => avatar(p.avatar)).join('');
+  $('#mini-avatars').innerHTML = (profiles.length ? profiles.slice(0, 4) : sampleProfiles.slice(0, 4)).map(p => avatar(p.avatar, p.avatarConfig)).join('');
 }
 function toast(message, error = false) {
   clearTimeout(toastTimer);
@@ -116,51 +133,72 @@ $$('[data-filter]').forEach(button => button.addEventListener('click', () => {
 $('#search').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); render(); });
 $('#reset-filters').addEventListener('click', () => { $('#search').value = ''; query = ''; $('[data-filter="All"]').click(); });
 function joinWall() {
-  if (settings.formUrl) {
-    const a = document.createElement('a');
-    a.href = settings.formUrl; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.click();
-    return;
+  if (!hasBackend() && settings.formUrl) {
+    const a = document.createElement('a'); a.href = settings.formUrl; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.click(); return;
   }
-  if (settings.feedUrl) { toast('Ask your hall organizer to add the Google Form link in Wall setup.'); return; }
-  $('#chosen-avatar').innerHTML = avatar(selectedAvatar);
+  if (!hasBackend() && settings.feedUrl) { toast('Ask your hall organizer to add the form link in Wall setup.'); return; }
+  $('#chosen-avatar').innerHTML = avatar(selectedAvatar, customAvatar);
+  $('#join-error').textContent = '';
+  $('#demo-form-note').textContent = hasBackend() ? 'Your introduction will appear after your hall organizer approves it.' : 'Try the form. This sample profile is saved on this browser only.';
+  $('#join-form .submit-button').innerHTML = hasBackend() ? 'Submit for approval →' : 'Add my sample profile →';
   openDialog('#join-dialog');
 }
 $$('[data-join]').forEach(button => button.addEventListener('click', joinWall));
-$('#change-avatar').addEventListener('click', () => { selectedAvatar = (selectedAvatar + 1) % avatars.length; $('#chosen-avatar').innerHTML = avatar(selectedAvatar); });
-$('#join-form').addEventListener('submit', e => {
+$('#change-avatar').addEventListener('click', () => { selectedAvatar = (selectedAvatar + 1) % avatars.length; customAvatar = randomAvatar(); $('#chosen-avatar').innerHTML = avatar(selectedAvatar, customAvatar); });
+let studioEditor;
+function showAvatarStudio() {
+  if (!studioEditor) studioEditor = mountAvatarEditor($('#avatar-editor'), customAvatar, value => { customAvatar = value; $('#chosen-avatar').innerHTML = avatar(0, value); });
+  else studioEditor.setConfig(customAvatar);
+  $('#avatar-dialog').showModal();
+}
+$('#customize-avatar').addEventListener('click', showAvatarStudio);
+$('#avatar-studio-button').addEventListener('click', showAvatarStudio);
+$('#create-avatar-button').addEventListener('click', showAvatarStudio);
+$('#use-avatar').addEventListener('click', () => { $('#avatar-dialog').close(); if (!$('#join-dialog').open) joinWall(); });
+$('#join-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const values = Object.fromEntries(new FormData(e.target));
-  for (const name of ['name', 'curriculum', 'intro', 'help', 'meet']) {
-    const input = e.target.elements.namedItem(name);
-    input.setCustomValidity(values[name].trim() ? '' : 'Please add a little about yourself.');
-    if (!input.reportValidity()) return;
-  }
-  const profile = normalizeProfiles({ profiles: [{ ...values, avatar: selectedAvatar, id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}` }] })[0];
-  localProfiles.unshift(profile);
-  const saved = storage.set('samples', localProfiles);
-  profiles = [...localProfiles, ...sampleProfiles];
-  query = ''; filter = 'All'; $('#search').value = ''; $('[data-filter="All"]').click();
-  $('#join-dialog').close(); e.target.reset(); render();
-  toast(saved ? 'You’re on the sample wall! Your profile is saved in this browser.' : 'You’re on the sample wall for this visit. Browser storage isn’t available.');
+  const form = e.target; const button = form.querySelector('.submit-button');
+  if (button.disabled) return;
+  const values = Object.fromEntries(new FormData(form));
+  try {
+    const profile = validateSubmission({ ...values, consent: form.elements.consent.checked, avatar: selectedAvatar, avatarConfig: customAvatar });
+    $('#join-error').textContent = ''; button.disabled = true;
+    if (hasBackend()) {
+      await api('submit', { profile, requestId: submissionId, website: values.website });
+      submissionId = crypto.randomUUID();
+      $('#join-dialog').close(); form.reset();
+      toast('Introduction received! Your hall organizer will review it before it appears on the wall.');
+    } else {
+      const sample = { ...profile, id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}` };
+      localProfiles.unshift(sample);
+      const saved = storage.set('samples', localProfiles);
+      profiles = [...localProfiles, ...sampleProfiles];
+      query = ''; filter = 'All'; $('#search').value = ''; $('[data-filter="All"]').click();
+      $('#join-dialog').close(); form.reset(); render();
+      toast(saved ? 'You’re on the sample wall! Your profile is saved in this browser.' : 'You’re on the sample wall for this visit. Browser storage isn’t available.');
+    }
+  } catch (error) { $('#join-error').textContent = error.message; }
+  finally { button.disabled = false; }
 });
 $('#join-form').addEventListener('input', e => e.target.setCustomValidity?.(''));
 
 async function applySettings() {
+  const joinURL = hasBackend() ? new URL('?join=1', location.href).href : settings.formUrl;
   $$('[data-hall]').forEach(el => el.textContent = settings.hallName);
   $('.brand').setAttribute('aria-label', `${settings.hallName} home`);
   document.title = `${settings.hallName} · Your hall, together`;
-  $('#source-label').textContent = settings.feedUrl ? 'HALL WALL' : 'SAMPLE WALL';
-  $('#note-avatars').hidden = !!settings.formUrl;
-  $('#join-qr').hidden = !settings.formUrl;
-  $('#note-avatars').innerHTML = [4, 1, 2].map(avatar).join('');
-  $('.hello-note h2').innerHTML = settings.formUrl ? 'Scan. Say hello.<br>Find your people.' : 'Your next friend might<br>be a few doors away.';
-  $('.note-foot').textContent = settings.formUrl ? 'Scan to introduce yourself to the hall.' : 'A little intro goes a long way.';
-  qrMarkup = settings.formUrl ? await QRCode.toString(settings.formUrl, { type: 'svg', margin: 1, errorCorrectionLevel: 'M', color: { dark: '#24251f', light: '#ffffff' } }) : '';
+  $('#source-label').textContent = hasFeed() ? 'HALL WALL' : 'SAMPLE WALL';
+  $('#note-avatars').hidden = !!joinURL;
+  $('#join-qr').hidden = !joinURL;
+  $('#note-avatars').innerHTML = [4, 1, 2].map(i => avatar(i)).join('');
+  $('.hello-note h2').innerHTML = joinURL ? 'Scan. Say hello.<br>Find your people.' : 'Your next friend might<br>be a few doors away.';
+  $('.note-foot').textContent = joinURL ? 'Scan to introduce yourself to the hall.' : 'A little intro goes a long way.';
+  qrMarkup = joinURL ? await QRCode.toString(joinURL, { type: 'svg', margin: 1, errorCorrectionLevel: 'M', color: { dark: '#24251f', light: '#ffffff' } }) : '';
   $('#join-qr').innerHTML = qrMarkup;
   updateDisplayJoin();
 }
 function showSettings() {
-  for (const key of ['hallName', 'formUrl', 'feedUrl']) $('#settings-form').elements.namedItem(key).value = settings[key];
+  for (const key of ['hallName', 'formUrl', 'feedUrl', 'backendUrl']) $('#settings-form').elements.namedItem(key).value = settings[key];
   $('#settings-error').textContent = '';
   openDialog('#settings-dialog');
 }
@@ -169,22 +207,23 @@ $('#settings-form').addEventListener('submit', async e => {
   e.preventDefault();
   try {
     const next = validateSettings(Object.fromEntries(new FormData(e.target)));
-    const changed = next.feedUrl !== settings.feedUrl;
+    const changed = next.feedUrl !== settings.feedUrl || next.backendUrl !== settings.backendUrl;
     if (changed) { feedGeneration++; activeRequest?.abort(); }
     settings = next;
     const saved = storage.set('settings', settings);
     if (changed) {
-      profiles = settings.feedUrl ? [] : [...localProfiles, ...sampleProfiles];
-      $('#feed-status').textContent = settings.feedUrl ? 'Ready when you are — press Refresh wall' : 'You choose when to update';
+      profiles = hasFeed() ? [] : [...localProfiles, ...sampleProfiles];
+      $('#feed-status').textContent = hasFeed() ? 'Ready when you are — press Refresh wall' : 'You choose when to update';
       $('#profile-dialog').close();
     }
     await applySettings(); render(); $('#settings-dialog').close();
+    if (changed) admin.reset();
     toast(saved ? 'Settings saved. Press Refresh wall when you’re ready.' : 'Settings applied for this visit. Browser storage isn’t available.');
   } catch (error) { $('#settings-error').textContent = error.message; }
 });
 async function refreshWall() {
   if (isFetching) return;
-  if (!settings.feedUrl) { showSettings(); toast('Connect your Google Sheet to refresh the wall.'); return; }
+  if (!hasFeed()) { showSettings(); toast('Connect your backend or Google Sheet to refresh the wall.'); return; }
   isFetching = true;
   const generation = feedGeneration;
   const oldProfiles = new Map(profiles.map(p => [p.id, JSON.stringify(p)]));
@@ -193,7 +232,7 @@ async function refreshWall() {
   $('#refresh-button').disabled = true; $('#display-refresh').disabled = true;
   $('#feed-status').textContent = 'Checking your hall’s submissions…';
   try {
-    const response = await fetch(settings.feedUrl, { method: 'GET', redirect: 'follow', cache: 'no-store', credentials: 'omit', signal: activeRequest.signal });
+    const response = await fetch(hasBackend() ? `${settings.backendUrl}/api/hall` : settings.feedUrl, { method: 'GET', redirect: 'follow', cache: 'no-store', credentials: 'omit', signal: activeRequest.signal });
     if (!response.ok) throw new Error(`The feed returned ${response.status}.`);
     const next = normalizeProfiles(await response.json());
     if (generation !== feedGeneration) return;
@@ -205,13 +244,13 @@ async function refreshWall() {
     displayPage = 0; render();
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     $('#feed-status').textContent = `Updated ${time} · Manual refresh`;
-    if (!next.length) $('#empty-state p').textContent = 'No approved profiles yet. Approve a row in your Sheet, then press Refresh wall.';
+    if (!next.length) $('#empty-state p').textContent = 'No approved profiles yet. Publish a profile, then press Refresh wall.';
     const changes = [added && `${added} new`, changed && `${changed} updated`, removed && `${removed} removed`].filter(Boolean).join(', ');
     toast(changes ? `Wall refreshed: ${changes} ${added + changed + removed === 1 ? 'profile' : 'profiles'}.` : 'All caught up. No changes to your hall wall.');
   } catch (error) {
     if (generation !== feedGeneration) return;
     $('#feed-status').textContent = 'Couldn’t update · Current wall kept';
-    toast('Couldn’t refresh. Check your connection and the Apps Script sharing settings, then try again. Your current wall is unchanged.', true);
+    toast('Couldn’t refresh. Check your connection and wall setup, then try again. Your current wall is unchanged.', true);
   } finally {
     clearTimeout(timeout); isFetching = false; activeRequest = null;
     $('#refresh-button').disabled = false; $('#display-refresh').disabled = false;
@@ -223,7 +262,7 @@ $('#about-button').addEventListener('click', () => openDialog('#about-dialog'));
 
 function updateDisplayJoin() {
   $('.display-join')?.remove();
-  if (!settings.formUrl) return;
+  if (!qrMarkup) return;
   const join = document.createElement('div'); join.className = 'display-join';
   join.innerHTML = `${qrMarkup}<span><strong>Join your hall wall</strong>Scan to say hello.</span>`;
   $('.site-header').append(join);
@@ -258,5 +297,9 @@ $('#pause-display').addEventListener('click', () => { displayPaused = !displayPa
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && display && !$('dialog[open]')) exitDisplay(); });
 document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && display) exitDisplay(); });
 window.addEventListener('resize', () => { if (display) render(); });
+const admin = setupAdmin({ api, getBaseURL: () => settings.backendUrl, cardHTML, avatar, escape, showSettings, toast });
+$('#admin-button').addEventListener('click', admin.open);
 applySettings(); render();
-if (settings.feedUrl) $('#feed-status').textContent = 'Ready when you are — press Refresh wall';
+if (new URLSearchParams(location.search).has('admin')) admin.open();
+if (new URLSearchParams(location.search).has('join')) joinWall();
+if (hasFeed()) $('#feed-status').textContent = 'Ready when you are — press Refresh wall';
