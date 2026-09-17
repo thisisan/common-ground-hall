@@ -13,3 +13,25 @@
 @media(max-width:560px){.avatar-studio{grid-template-columns:1fr}.avatar-stage>img{width:220px;height:220px}.avatar-stage-actions{position:absolute;right:22px;top:185px;flex-direction:column}.avatar-stage-actions .button{font-size:9px;padding:6px}.avatar-choices{grid-template-columns:repeat(5,1fr);max-height:185px}.avatar-tabs{justify-content:center}.avatar-dialog{padding:26px 20px}.admin-heading h1{font-size:33px}.admin-heading p{line-height:1.7}.admin-topline .eyebrow{font-size:7px;letter-spacing:.8px}.admin-topline .button{font-size:9px;padding:8px}.admin-stats{gap:8px}.admin-stats button{padding:13px 10px}.admin-stats span{letter-spacing:.5px;font-size:6px}.admin-stats small{font-size:8px}.admin-table-head{font-size:7px}.admin-row{grid-template-columns:1.3fr .65fr 70px;padding:12px;gap:7px}.admin-resident{gap:7px}.admin-resident strong{font-size:10px}.admin-avatar{width:35px;height:35px}.status-pill{font-size:8px;padding:4px 5px}.admin-row .button{font-size:8px;padding:8px 5px}footer>div{flex-wrap:wrap;justify-content:center;gap:14px}.card-footer:has(.social-chip.xhs) .hello-label,.card-footer:has(.social-chip.linkedin) .hello-label{display:none}.social-chip{font-size:8px}.social-chip.linkedin span{display:none}}
 
 @media(max-width:700px){.avatar-nav{display:none}}
+
+/* Generic social accounts: repeating platform+account editor and chips. */
+.social-fieldset{border:0;padding:0;margin:0;min-width:0}
+.social-fieldset legend{font-size:11px;font-weight:700;padding:0;margin-bottom:8px}
+.social-input{display:grid;gap:9px}
+.social-rows{display:grid;gap:8px}
+.social-row{display:grid;grid-template-columns:140px 1fr 30px;gap:8px;align-items:center}
+.social-row select,.social-row input{width:100%;min-width:0;padding:10px 12px;background:#fff;border:1px solid #ced1c3;border-radius:6px;font-size:12px;line-height:1.5;color:var(--ink)}
+.social-remove{width:30px;height:30px;border-radius:50%;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:16px;line-height:1;color:var(--muted)}
+.social-remove:hover{background:#f2ded9;color:#8f3f36}
+.social-add{color:var(--muted);font-size:11px;justify-self:start}
+span.social-chip{cursor:default}
+.social-chip.instagram{color:#9d3f76;background:#f9ecf4}
+.social-chip.tiktok,.social-chip.x,.social-chip.threads{color:#26261f;background:#ebece6}
+.social-chip.youtube{color:#9b3a33;background:#f9eceb}
+.social-chip.facebook{color:#2f5390;background:#eaeff8}
+.social-chip.telegram{color:#2a6b8f;background:#e9f2f7}
+.social-chip.snapchat{color:#7f6a1c;background:#faf6da}
+.social-chip.discord{color:#4a4d84;background:#eeeef8}
+.social-chip.wechat{color:#3c7a3e;background:#eaf4ea}
+.social-chip.website{color:#4f5545;background:#eef0e8}
+@media(max-width:560px){.social-row{grid-template-columns:1fr 30px;grid-template-areas:"platform remove" "value value"}.social-row select{grid-area:platform}.social-remove{grid-area:remove}.social-row input{grid-area:value}}

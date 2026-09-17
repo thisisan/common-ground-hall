@@ -17,6 +17,15 @@ test.beforeAll(async () => {
 });
 test.afterAll(async () => { if (server && server.exitCode === null) { server.kill(); await new Promise(resolve => server.once('exit', resolve)); } if (folder) rmSync(folder, { recursive: true, force: true }); });
 async function call(action, values = {}) { const r = await fetch(`${backendURL}/api/hall`, { method: 'POST', body: JSON.stringify({ action, ...values }) }); return await r.json(); }
+// Drive the repeating platform+account editor: one row per entry, adding rows as needed.
+async function setSocials(page, scope, entries) {
+  const rows = page.locator(`${scope} .social-row`);
+  for (const [index, [platform, value]] of entries.entries()) {
+    if (await rows.count() <= index) await page.locator(`${scope} .social-add`).click();
+    await rows.nth(index).locator('.social-platform').selectOption(platform);
+    await rows.nth(index).locator('.social-value').fill(value);
+  }
+}
 
 test('Avatartion studio lets residents customize, download and use an avatar', async ({ page }) => {
   await page.goto('/');
@@ -36,8 +45,9 @@ test('Avatartion studio lets residents customize, download and use an avatar', a
   await page.screenshot({ path: 'evidence/avatar-studio-mobile.png', animations: 'disabled' });
   await page.getByRole('button', { name: 'Use this avatar' }).click();
   await expect(page.locator('#join-dialog')).toBeVisible();
-  await expect(page.locator('#join-dialog [name=xhs]')).toBeVisible();
-  await expect(page.locator('#join-dialog [name=linkedin]')).toBeVisible();
+  await expect(page.locator('#join-socials .social-row')).toHaveCount(1);
+  await expect(page.locator('#join-socials .social-platform')).toHaveValue('instagram');
+  await expect(page.locator('#join-socials .social-add')).toBeVisible();
 });
 
 test('real database flow: submit, admin edit/publish, refresh, social links and archive', async ({ page }) => {
@@ -53,7 +63,9 @@ test('real database flow: submit, admin edit/publish, refresh, social links and 
   await page.goto('/');
   await expect(page.locator('#profile-grid .profile-card')).toHaveCount(0);
   await page.getByRole('button', { name: 'Join the wall', exact: true }).click();
-  for (const [name, value] of Object.entries({ name: 'Taylor Park', curriculum: 'Psychology', intro: 'A movie fan who loves hiking.', help: 'Research and essay feedback', meet: 'Film-night friends', handle: 'taylorpark', xhs: 'https://www.xiaohongshu.com/user/profile/abc123', linkedin: 'https://www.linkedin.com/in/taylor-park' })) await page.locator(`#join-form [name=${name}]`).fill(value);
+  for (const [name, value] of Object.entries({ name: 'Taylor Park', curriculum: 'Psychology', intro: 'A movie fan who loves hiking.', help: 'Research and essay feedback', meet: 'Film-night friends' })) await page.locator(`#join-form [name=${name}]`).fill(value);
+  // Three different platforms, entered through the generic social editor.
+  await setSocials(page, '#join-socials', [['instagram', '@taylorpark'], ['xhs', 'https://www.xiaohongshu.com/user/profile/abc123'], ['linkedin', 'https://www.linkedin.com/in/taylor-park']]);
   await page.locator('#join-form [name=consent]').check();
   await page.getByRole('button', { name: 'Submit for approval' }).click();
   await expect(page.locator('#toast')).toContainText('Introduction received');
@@ -64,6 +76,15 @@ test('real database flow: submit, admin edit/publish, refresh, social links and 
   await page.locator('#admin-login-form [name=password]').fill(password);
   await page.getByRole('button', { name: 'Sign in to your hall' }).click();
   await expect(page.locator('#admin-workspace')).toBeVisible();
+  // Wall setup — including the Google Form and Apps Script feed links — opens from the dashboard.
+  await page.locator('#admin-settings').click();
+  await expect(page.locator('#settings-dialog')).toBeVisible();
+  await expect(page.locator('#settings-form [name=formUrl]')).toBeVisible();
+  await expect(page.locator('#settings-form [name=feedUrl]')).toBeVisible();
+  await expect(page.locator('#settings-form [name=backendUrl]')).toHaveValue(backendURL);
+  await page.locator('#settings-dialog [data-close]').click();
+  await expect(page.locator('#settings-dialog')).toBeHidden();
+  await expect(page.locator('#admin-workspace')).toBeVisible();
   await expect(page.locator('#pending-total')).toHaveText('4');
   await page.locator('#toast').evaluate(el => el.hidden = true);
   await page.screenshot({ path: 'evidence/admin-board.png', animations: 'disabled' });
@@ -73,6 +94,9 @@ test('real database flow: submit, admin edit/publish, refresh, social links and 
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.locator('.admin-row').filter({ hasText: 'Taylor Park' }).getByRole('button', { name: 'Review' }).click();
   await page.locator('#admin-edit-form [name=intro]').fill('A movie fan, hiker and matcha enthusiast.');
+  // The resident's three accounts round-trip into the admin editor, and a fourth can be added.
+  await expect(page.locator('#admin-socials .social-row')).toHaveCount(3);
+  await setSocials(page, '#admin-socials', [['instagram', 'taylorpark'], ['xhs', 'https://www.xiaohongshu.com/user/profile/abc123'], ['linkedin', 'https://www.linkedin.com/in/taylor-park'], ['tiktok', 'taylor.park']]);
   await page.locator('#admin-edit-form [name=featured]').check();
   await page.getByRole('button', { name: 'Save profile changes' }).click();
   await expect(page.locator('#toast')).toContainText('Profile changes saved');
@@ -87,8 +111,10 @@ test('real database flow: submit, admin edit/publish, refresh, social links and 
   const card = page.locator('#profile-grid .profile-card').first();
   await expect(card).toContainText('Taylor Park');
   await expect(card).toContainText('matcha enthusiast');
-  await expect(card.getByRole('link', { name: 'Find Taylor Park on XHS' })).toHaveAttribute('href', 'https://www.xiaohongshu.com/user/profile/abc123');
+  await expect(card.getByRole('link', { name: 'Find Taylor Park on Instagram' })).toHaveAttribute('href', 'https://www.instagram.com/taylorpark/');
+  await expect(card.getByRole('link', { name: 'Find Taylor Park on XHS / 小红书' })).toHaveAttribute('href', 'https://www.xiaohongshu.com/user/profile/abc123');
   await expect(card.getByRole('link', { name: 'Find Taylor Park on LinkedIn' })).toHaveAttribute('href', 'https://www.linkedin.com/in/taylor-park');
+  await expect(card.getByRole('link', { name: 'Find Taylor Park on TikTok' })).toHaveAttribute('href', 'https://www.tiktok.com/@taylor.park');
   await page.getByRole('button', { name: 'Admin board' }).click();
   await expect(page.locator('#admin-workspace')).toBeVisible();
   await page.locator('[data-admin-status=published]').click();
