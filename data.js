@@ -1,6 +1,6 @@
 import { cleanAvatar } from './avatar-schema.js';
 import { cleanSocials, legacyMirror } from './social-schema.js';
-export const categories = ['Arts & Design', 'Business', 'Engineering', 'Science', 'Other'];
+export const categories = ['Arts & Design', 'Business', 'Engineering', 'Science', 'Medic and Law', 'Other'];
 export const sampleProfiles = [
   { id: 'demo-1', name: 'Alex Chan', curriculum: 'Architecture', category: 'Arts & Design', year: 'Year 2', intro: 'Sketchbook always in hand. Usually hunting down the best milk tea.', help: 'Sketching, Adobe tools & late-night model making.', meet: 'Creative souls and weekend café explorers.', socials: [{ platform: 'instagram', value: 'alex.sketches' }, { platform: 'xhs', value: 'https://www.xiaohongshu.com/user/profile/5f2a1b3c' }], avatar: 0 },
   { id: 'demo-2', name: 'Sophie Wong', curriculum: 'Business Administration', category: 'Business', year: 'Year 1', intro: 'New to hall life. Big on good food and even better conversations.', help: 'Presentations, baking & finding a good deal.', meet: 'Dinner buddies and people to try new things with.', handle: 'sophiew.jpg', avatar: 1 },

@@ -45,6 +45,10 @@ try {
   await Promise.all([page.waitForEvent('load'), page.getByRole('button', { name: 'Refresh wall', exact: true }).first().click()]);
   await page.waitForLoadState('networkidle');
   assert.equal(await page.locator('.profile-card').count(), profiles.length);
+  await page.getByRole('button', { name: 'Medic and Law', exact: true }).click();
+  assert.equal(await page.locator('.profile-card').count(), profiles.filter(profile => profile.category === 'Medic and Law').length);
+  await page.getByRole('button', { name: 'Everyone', exact: true }).click();
+  assert.equal(await page.locator('.profile-card').count(), profiles.length);
   // Keep the deployment evidence free of transient notices.
   await page.locator('#toast').evaluate(el => el.hidden = true);
   await mkdir(new URL('../evidence/', import.meta.url), { recursive: true });
@@ -55,7 +59,7 @@ try {
   await page.evaluate(() => scrollTo(0, 0));
   await page.screenshot({ path: new URL('../evidence/hosted-mobile.png', import.meta.url).pathname, animations: 'disabled' });
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ url: url.href, httpStatus: 200, profiles: profiles.length, photos: Object.keys(photos).length, initials: 4, hiddenCommunityTools: 'passed', hallBranding: 'passed', search: 'passed', allProfileFieldsAndPhotoMappings: 'passed', refresh: 'passed', avatars: 'loaded', mobileOverflow: false, browserErrors: errors }));
+  console.log(JSON.stringify({ url: url.href, httpStatus: 200, profiles: profiles.length, photos: Object.keys(photos).length, initials: 4, hiddenCommunityTools: 'passed', hallBranding: 'passed', medicAndLawFilter: 'passed', search: 'passed', allProfileFieldsAndPhotoMappings: 'passed', refresh: 'passed', avatars: 'loaded', mobileOverflow: false, browserErrors: errors }));
 } finally {
   await browser.close();
 }
