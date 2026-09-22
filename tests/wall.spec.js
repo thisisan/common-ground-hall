@@ -147,8 +147,8 @@ test('desktop and mobile layout render without overflow or missing avatars', asy
 test('resident pictures, missing-picture initials, and complete contact details', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#source-label')).toHaveText('HALL WALL');
-  await expect(page.locator('#profile-grid .resident-photo')).toHaveCount(19);
-  await expect(page.locator('#profile-grid .resident-initials')).toHaveCount(4);
+  await expect(page.locator('#profile-grid .resident-photo')).toHaveCount(18);
+  await expect(page.locator('#profile-grid .resident-initials')).toHaveCount(5);
   await expect(page.locator('#profile-grid')).not.toContainText('Alex Chan');
   await page.getByRole('button', { name: 'Contact Héctor', exact: true }).click();
   await expect(page.locator('#profile-detail')).toContainText('Instagram/PlayStation/Xbox: hechss');

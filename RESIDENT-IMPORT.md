@@ -2,7 +2,7 @@
 
 Updated 22 September 2026 from the organizer's registration spreadsheet and
 Profile Pictures folder. The deployed wall includes 23 resident profiles and
-19 matched uploaded pictures. It is a published snapshot, not an automatic
+18 displayed uploaded pictures. It is a published snapshot, not an automatic
 Google Sheets sync. Refresh wall reloads the published version when no live
 backend or Apps Script feed is configured.
 
@@ -23,6 +23,8 @@ not need Drive access. Missing uploads use initials:
 - Rebecca
 - Franklin
 - Dorothy
+
+Raven’s picture was removed from the published wall at the organizer’s request; his profile remains and shows an initial.
 
 Four other files in the folder had no corresponding spreadsheet entry and were
 not published. The unmatched Li upload was not assigned to Rebecca Zhang.

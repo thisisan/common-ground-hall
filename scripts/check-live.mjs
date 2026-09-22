@@ -61,7 +61,7 @@ try {
   await page.evaluate(() => scrollTo(0, 0));
   await page.screenshot({ path: new URL('../evidence/hosted-mobile.png', import.meta.url).pathname, animations: 'disabled' });
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ url: url.href, httpStatus: 200, profiles: profiles.length, photos: Object.keys(photos).length, initials: 4, hiddenCommunityTools: 'passed', hallBranding: 'passed', separateMedicAndLawFilters: 'passed', search: 'passed', allProfileFieldsAndPhotoMappings: 'passed', refresh: 'passed', avatars: 'loaded', mobileOverflow: false, browserErrors: errors }));
+  console.log(JSON.stringify({ url: url.href, httpStatus: 200, profiles: profiles.length, photos: Object.keys(photos).length, initials: profiles.length - Object.keys(photos).length, hiddenCommunityTools: 'passed', hallBranding: 'passed', separateMedicAndLawFilters: 'passed', search: 'passed', allProfileFieldsAndPhotoMappings: 'passed', refresh: 'passed', avatars: 'loaded', mobileOverflow: false, browserErrors: errors }));
 } finally {
   await browser.close();
 }
