@@ -8,7 +8,7 @@ Public site: https://thisisan.github.io/common-ground-hall/
 
 Source repository: https://github.com/thisisan/common-ground-hall
 
-GitHub Pages serves the committed `docs/` folder on `main`. To publish changes, run `npm ci && npm run build:pages`, commit the updated source and `docs/`, then push to `main`. It uses sample residents until an omg.dev backend or the optional Google Sheets feed is connected. Only the hall site is included in its public repository.
+GitHub Pages serves the committed `docs/` folder on `main`. To publish changes, run `npm ci && npm run build:pages`, commit the updated source and `docs/`, then push to `main`. It includes the reviewed SKY Lee Hall snapshot: 23 residents and 19 uploaded pictures. See [RESIDENT-IMPORT.md](RESIDENT-IMPORT.md) for import details and missing pictures. Updates to Google Sheets are not automatically synced; rebuild and publish a reviewed snapshot, or configure an omg.dev backend or Apps Script feed. Only the hall site is included in its public repository.
 
 Verify the deployed page with `SITE_URL=https://thisisan.github.io/common-ground-hall/ node scripts/check-live.mjs`. The check exercises the actual hosted site and saves `evidence/hosted-desktop.png`.
 

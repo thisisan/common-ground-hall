@@ -35,3 +35,14 @@ span.social-chip{cursor:default}
 .social-chip.wechat{color:#3c7a3e;background:#eaf4ea}
 .social-chip.website{color:#4f5545;background:#eef0e8}
 @media(max-width:560px){.social-row{grid-template-columns:1fr 30px;grid-template-areas:"platform remove" "value value"}.social-row select{grid-area:platform}.social-remove{grid-area:remove}.social-row input{grid-area:value}}
+
+/* Uploaded resident pictures retain their original proportions. */
+.portrait>img.resident-photo{width:100%;height:100%;left:0;bottom:0;object-fit:contain}
+.resident-initials{display:flex;align-items:center;justify-content:center;font-size:58px;font-weight:750;width:100%;height:100%;color:#595b4c}
+#mini-avatars .resident-initials{width:33px;height:33px;font-size:12px;border:2px solid var(--paper);border-radius:50%;background:#e7e4d5;margin-left:-8px}
+.contact-button{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;background:transparent;font-size:10px;font-weight:750;padding:4px 0}
+.contact-button:hover{text-decoration:underline}
+.profile-dialog .profile-field p{white-space:pre-line}
+.profile-dialog .resident-initials{font-size:76px}
+
+.card-footer{flex-wrap:wrap}.social-links{min-width:0;max-width:100%}.social-chip{max-width:100%;overflow-wrap:anywhere}.contact-button{margin-left:auto}

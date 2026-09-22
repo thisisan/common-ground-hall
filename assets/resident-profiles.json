@@ -1,0 +1,356 @@
+[
+  {
+    "id": "resident-1",
+    "name": "Ethan",
+    "curriculum": "6303",
+    "category": "Other",
+    "year": "Year 1",
+    "intro": "Sleep more than I should, trying to work harder.",
+    "help": "Time, Making things, or other things.",
+    "meet": "Study mates, Someone to explore hidden spots with, Engineers, Cantonese speakers.",
+    "contact": "WhatsApp (+852) 9426 8371",
+    "socials": [],
+    "avatar": 0
+  },
+  {
+    "id": "resident-2",
+    "name": "Raven",
+    "curriculum": "6779",
+    "category": "Other",
+    "year": "Year 1",
+    "intro": "ENFP super extroverted",
+    "help": "Singing  Playing Ball game",
+    "meet": "i wanna make a lot of different friends at the hall",
+    "contact": "Whatsapp：+852 53188779\nWechat：RavenXu_\nInstagram：xuxianraven",
+    "socials": [
+      {
+        "platform": "instagram",
+        "value": "xuxianraven"
+      }
+    ],
+    "avatar": 1
+  },
+  {
+    "id": "resident-3",
+    "name": "Héctor",
+    "curriculum": "Bachelor of biological sciences",
+    "category": "Science",
+    "year": "Year 4",
+    "intro": "Gamer (video and board), animal lover, night owl, techno dancer, karaoke",
+    "help": "Karaoke pair, board games\nSpanish/Catalan/German/Italian/French practise",
+    "meet": "Weekend adventure buddies, karaoke companions, board game groups",
+    "contact": "WhatsApp +34 619546848\nInstagram/PlayStation/Xbox: hechss",
+    "socials": [
+      {
+        "platform": "instagram",
+        "value": "hechss"
+      }
+    ],
+    "avatar": 2
+  },
+  {
+    "id": "resident-4",
+    "name": "Jason Feng",
+    "curriculum": "BSc(Ac)",
+    "category": "Science",
+    "year": "Year 1",
+    "intro": "Gamer/ NBA fan/ terrible chef/ ENFP/ Gym guy/ Basketball guy",
+    "help": "enjoy playing basketball/ can speak three languages (Canto,Mandarin,English)/ no cooking experience",
+    "meet": "Basketball players/ gym partners/ gym bros",
+    "contact": "(+86)15088022813",
+    "socials": [],
+    "avatar": 3
+  },
+  {
+    "id": "resident-5",
+    "name": "Super Yello Duck",
+    "curriculum": "computer science",
+    "category": "Engineering",
+    "year": "Year 2",
+    "intro": "Photographer",
+    "help": "Badminton  study tips  photography",
+    "meet": "Badminton lover  who can find hidden food spot   photography lover",
+    "contact": "ig: Super Yellow Duck Davidh",
+    "socials": [],
+    "avatar": 4
+  },
+  {
+    "id": "resident-6",
+    "name": "Rebecca",
+    "curriculum": "Business",
+    "category": "Business",
+    "year": "Year 2",
+    "intro": "ISTJ\nFoodie\ndog person",
+    "help": "Badminton\nMovies\nTravel\nCooking",
+    "meet": "Language exchange partners\nNice food explorers \nBadminton buddies",
+    "contact": "WhatsApp +852 69797570\nWechat：Meng20070131\ninstagram rrrbk0131",
+    "socials": [
+      {
+        "platform": "instagram",
+        "value": "rrrbk0131"
+      }
+    ],
+    "avatar": 5
+  },
+  {
+    "id": "resident-7",
+    "name": "Joanne",
+    "curriculum": "Computer Science",
+    "category": "Engineering",
+    "year": "Year 1",
+    "intro": "ESFJ, Fan‑fiction enthusiast, Early bird",
+    "help": "Fan‑fiction writing sharing, Comics & manga sharing，Casual hiking companion，Coding & study group",
+    "meet": "Language-exchange partners, Novel lover, Weekend adventure buddies",
+    "contact": "WhatsApp:(+852)65879979\nWeChat:joa9158",
+    "socials": [],
+    "avatar": 6
+  },
+  {
+    "id": "resident-8",
+    "name": "Valentin",
+    "curriculum": "International Relations",
+    "category": "Other",
+    "year": "Postgraduate",
+    "intro": "Very outgoing, down for everything",
+    "help": "Having lived in several countries and good vibes. Sport enthousiast :)",
+    "meet": "Other people that would like to explore HK or do activities together",
+    "contact": "WhatsApp (+41 78 944 70 29)",
+    "socials": [],
+    "avatar": 7
+  },
+  {
+    "id": "resident-9",
+    "name": "Lloyd",
+    "curriculum": "Business",
+    "category": "Business",
+    "year": "Year 2",
+    "intro": "ENTP\ncat owner\ngamer\nfoodie",
+    "help": "badminton guy\ncomputer fixer\ncooking",
+    "meet": "badminton player\ngamer\ntravel partner",
+    "contact": "Whatsapp +852 69797120\nWechat _18251884137",
+    "socials": [],
+    "avatar": 8
+  },
+  {
+    "id": "resident-10",
+    "name": "Stella",
+    "curriculum": "Science",
+    "category": "Science",
+    "year": "Year 3",
+    "intro": "AI expert / Early bird / Night owl / INFP / Gamer / Foodie / Travel lover",
+    "help": "Study tips/notes / Group project teaming / Movie/Book/Anime/ Online game teaming / Board games / Lunch/Travel",
+    "meet": "Study tips/notes / Group project teaming / Movie/Book/Anime/ Online game teaming / Board games / Lunch/Travel",
+    "contact": "WeChat: SacredPoeticBridge WhatsApp: 63156320",
+    "socials": [],
+    "avatar": 9
+  },
+  {
+    "id": "resident-11",
+    "name": "Peter",
+    "curriculum": "Philosophy/History",
+    "category": "Other",
+    "year": "Year 2",
+    "intro": "Moviegoer/ Traver lover/ Hiking enthusiast",
+    "help": "Lunch/Movie/Hiking/Travel companion/ Board games/ Movie/Book/TV show recommendations",
+    "meet": "Movie enthusiasts/Weekend adventure buddies/Travel partners",
+    "contact": "WeChat: A13943080922 / WhatsApp: (+852) 69404227",
+    "socials": [],
+    "avatar": 10
+  },
+  {
+    "id": "resident-12",
+    "name": "Franklin",
+    "curriculum": "Math",
+    "category": "Science",
+    "year": "Year 1",
+    "intro": "I am a big basketball fan.",
+    "help": "Hiking and karaoke companion / Cantonese practice",
+    "meet": "Study buddies/Group project partners / Basketball players / Karaoke companions",
+    "contact": "WhatsApp: (+852) 6267-8756",
+    "socials": [],
+    "avatar": 11
+  },
+  {
+    "id": "resident-13",
+    "name": "Derek",
+    "curriculum": "BSc mathematics",
+    "category": "Science",
+    "year": "Year 1",
+    "intro": "Easygoing, Intelligent, Kind, Musician, ESTJ",
+    "help": "Singing, playing guitar, cooking tips, board games, sports (badminton, pool, pingpang, soccer and so on)",
+    "meet": "Language-exchange partners (to teach me Cantonese), Pingpong players, people who are interested in forming a band, People who enjoy meaningful conversations",
+    "contact": "Whatsapp: 64305605, Wechat: cdy15800424296, Instagram: derek_chen128x.inl",
+    "socials": [
+      {
+        "platform": "instagram",
+        "value": "derek_chen128x.inl"
+      }
+    ],
+    "avatar": 12
+  },
+  {
+    "id": "resident-14",
+    "name": "Ricardo",
+    "curriculum": "Computer Science",
+    "category": "Engineering",
+    "year": "Year 1",
+    "intro": "Gamer(Honor of Kings and PUBG)\nBasketballer\nNight owl\nPythoner\nINFP",
+    "help": "Team of Honor of Kings.\nBasketball playing together.\nDiscussion of CDS,AI and MATH.",
+    "meet": "Partners to play Honor of Kings or even join comptition together.\nBasketball players.\nCDS and AI and MATH discusser.",
+    "contact": "WeChat/WhatsApp：（+86）15618872260\nInstagram:ricardomoonwood\nEmail:u3681914@connect.hku.hk",
+    "socials": [
+      {
+        "platform": "instagram",
+        "value": "ricardomoonwood"
+      }
+    ],
+    "avatar": 13
+  },
+  {
+    "id": "resident-15",
+    "name": "Nicole",
+    "curriculum": "Computer Science",
+    "category": "Engineering",
+    "year": "Year 2",
+    "intro": "ENFJ, Foodie, Canadian-Chinese",
+    "help": "Cooking, Canada, Board Games, Computer Science",
+    "meet": "Study buddies, photography lovers, meet anyone!",
+    "contact": "Instagram: @nicole._.xie",
+    "socials": [
+      {
+        "platform": "instagram",
+        "value": "nicole._.xie"
+      }
+    ],
+    "avatar": 14
+  },
+  {
+    "id": "resident-16",
+    "name": "Angie",
+    "curriculum": "Physics",
+    "category": "Science",
+    "year": "Year 1",
+    "intro": "INTP / movies / taking photos / funtime",
+    "help": "Language learning / board games / down for anything",
+    "meet": "Study together / deep conversations / fun time",
+    "contact": "WhatsApp/WeChat: (+36) 705805256 / Instagram: @alexangel901",
+    "socials": [
+      {
+        "platform": "instagram",
+        "value": "alexangel901"
+      }
+    ],
+    "avatar": 15
+  },
+  {
+    "id": "resident-17",
+    "name": "Anh Minh",
+    "curriculum": "Engineering",
+    "category": "Engineering",
+    "year": "Year 1",
+    "intro": "Music enthusiast, cat person, active",
+    "help": "- I play guitar and piano and I love old music (Jazz, the Beatles, etc)\n- I enjoy a few animes like Persona and Neon Genesis Evangelion\n- I try to keep myself active via gym, calisthenics and running\n- May or may not soft cosplay",
+    "meet": "- Gym buddies\n- People who are down to jam with me, or just listen to me share my music stuff\n- Weekend hangout friends\n- Geeks willing to yap about anything.",
+    "contact": "Instagram: miingle__\nWhatsApp: (+84) 921059405",
+    "socials": [
+      {
+        "platform": "instagram",
+        "value": "miingle__"
+      }
+    ],
+    "avatar": 0
+  },
+  {
+    "id": "resident-18",
+    "name": "Umid",
+    "curriculum": "Humanities and Engineering",
+    "category": "Engineering",
+    "year": "Year 2",
+    "intro": "Coding, Entrepreneur, Gym rat, ENFJ-T",
+    "help": "Online game teaming, Board games, Group Project teaming",
+    "meet": "Volleyball players",
+    "contact": "WhatsApp (+852) 5532 7709",
+    "socials": [],
+    "avatar": 1
+  },
+  {
+    "id": "resident-19",
+    "name": "Nova",
+    "curriculum": "Computer Science",
+    "category": "Engineering",
+    "year": "Year 1",
+    "intro": "Animie fan\nMaimai player\nVocaloid/Jpop/K-pop music\nCat owner \nCute stuff addict",
+    "help": "Animie recommends \nStudy tips (computer)\n(A little sunshine for your rainy days )",
+    "meet": "Anime fans\nMaimai player\nMusic lovers",
+    "contact": "(+852) 53004409\nWechat: chengshuyue0340",
+    "socials": [],
+    "avatar": 2
+  },
+  {
+    "id": "resident-20",
+    "name": "Trystan",
+    "curriculum": "Engineering",
+    "category": "Engineering",
+    "year": "Year 2",
+    "intro": "Sports fan / Early Bird / Tech enthusiast",
+    "help": "Cooking tips / Tech support / Engineering Study tips",
+    "meet": "Sports enthusiasts / Adventure buddies / Hackathon Teammates",
+    "contact": "WhatsApp: (+852)47160440 / Instagram: @trystanalexanderr",
+    "socials": [
+      {
+        "platform": "instagram",
+        "value": "trystanalexanderr"
+      }
+    ],
+    "avatar": 3
+  },
+  {
+    "id": "resident-21",
+    "name": "Autumn",
+    "curriculum": "Computer Science",
+    "category": "Engineering",
+    "year": "Year 1",
+    "intro": "Foodie / ENFP / Anime Fan /Birdwatching enthusiast",
+    "help": "Anime Recommendations / Birdwatching / Lunch companion",
+    "meet": "Anime enthusiasts / Birdwatchers /Study companions",
+    "contact": "Email:2043515453@qq.com",
+    "socials": [],
+    "avatar": 4
+  },
+  {
+    "id": "resident-22",
+    "name": "Dorothy",
+    "curriculum": "Global Creative Industries",
+    "category": "Arts & Design",
+    "year": "Year 1",
+    "intro": "Travel lover and proud cat/dog owner",
+    "help": "study tips; study buddy, group project teaming, we can cook together; lunch/weekend companion etc.",
+    "meet": "Study buddies; lunch companions; weekend adventure buddies...or simply anyone or wish to talk; all welcomed :)",
+    "contact": "WhatsApp: 98519915; Wechat: ltq0919sea; Instagram: Dorothyxiaoluobo; Email: u3669471@connect.hku.hk",
+    "socials": [
+      {
+        "platform": "instagram",
+        "value": "Dorothyxiaoluobo"
+      }
+    ],
+    "avatar": 5
+  },
+  {
+    "id": "resident-23",
+    "name": "aarshia",
+    "curriculum": "Business",
+    "category": "Business",
+    "year": "Year 1",
+    "intro": "animal lover, writer & editor and professional yapper",
+    "help": "tv & book recommendations, art + help with essays & math",
+    "meet": "language exchange partners, spontaneous adventure lovers, artists & people who enjoy meaningful conversations",
+    "contact": "whatsapp: 5491 9673\ninstagram: aar_sh1ak",
+    "socials": [
+      {
+        "platform": "instagram",
+        "value": "aar_sh1ak"
+      }
+    ],
+    "avatar": 6
+  }
+]
