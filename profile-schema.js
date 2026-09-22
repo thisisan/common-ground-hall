@@ -9,7 +9,7 @@ export function validateSubmission(input) {
     if (!value || value.length > max) throw new ProfileValidationError(`${({ name: 'Name', curriculum: 'Course', intro: 'Introduction', help: 'I can help with', meet: 'I want to meet' })[key]} is required and must be ${max} characters or fewer.`);
     profile[key] = value;
   }
-  if (!['Arts & Design', 'Business', 'Engineering', 'Science', 'Medic and Law', 'Other'].includes(input.category)) throw new ProfileValidationError('Choose a curriculum group.');
+  if (!['Arts & Design', 'Business', 'Engineering', 'Science', 'Medic', 'Law', 'Other'].includes(input.category)) throw new ProfileValidationError('Choose a curriculum group.');
   if (!['Year 1', 'Year 2', 'Year 3', 'Year 4+', 'Postgraduate'].includes(input.year)) throw new ProfileValidationError('Choose your year of study.');
   if (input.consent !== true) throw new ProfileValidationError('Please agree to share your profile on the hall wall.');
   profile.category = input.category; profile.year = input.year; profile.consent = true;
