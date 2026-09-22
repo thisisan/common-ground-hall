@@ -39,7 +39,7 @@ export function normalizeProfiles(payload) {
 }
 
 export function validateSettings(settings) {
-  const result = { hallName: String(settings.hallName || 'Common Ground').trim().slice(0, 60), feedUrl: '', formUrl: '', backendUrl: '' };
+  const result = { hallName: String(settings.hallName || 'Simon K. Y. Lee Hall, HKU').trim().slice(0, 60), feedUrl: '', formUrl: '', backendUrl: '' };
   if (settings.backendUrl) {
     let url; try { url = new URL(String(settings.backendUrl).trim()); } catch { throw new Error('Enter a valid omg.dev backend URL.'); }
     const local = ['localhost', '127.0.0.1'].includes(url.hostname);

@@ -19,8 +19,11 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   const response = await page.goto(url.href, { waitUntil: 'networkidle' });
   assert.equal(response.status(), 200);
-  assert.equal(await page.title(), 'SKY Lee Hall · Your hall, together');
+  assert.equal(await page.title(), 'Social Wall · Simon K. Y. Lee Hall, HKU');
   assert.equal(await page.locator('.profile-card').count(), profiles.length);
+  for (const selector of ['#create-avatar-button', '#display-button', '#avatar-studio-button', '[data-join]']) {
+    assert.equal(await page.locator(selector).evaluateAll(elements => elements.every(el => !el.getClientRects().length)), true);
+  }
   assert.equal(await page.locator('#profile-grid .resident-photo').count(), Object.keys(photos).length);
   assert.equal(await page.locator('#profile-grid .resident-initials').count(), profiles.length - Object.keys(photos).length);
   for (const profile of profiles) {
@@ -45,13 +48,14 @@ try {
   // Keep the deployment evidence free of transient notices.
   await page.locator('#toast').evaluate(el => el.hidden = true);
   await mkdir(new URL('../evidence/', import.meta.url), { recursive: true });
+  await page.evaluate(() => scrollTo(0, 0));
   await page.screenshot({ path: new URL('../evidence/hosted-desktop.png', import.meta.url).pathname, animations: 'disabled' });
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
-  await page.locator('.wall-heading').scrollIntoViewIfNeeded();
+  await page.evaluate(() => scrollTo(0, 0));
   await page.screenshot({ path: new URL('../evidence/hosted-mobile.png', import.meta.url).pathname, animations: 'disabled' });
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ url: url.href, httpStatus: 200, profiles: profiles.length, photos: Object.keys(photos).length, initials: 4, search: 'passed', allProfileFieldsAndPhotoMappings: 'passed', refresh: 'passed', avatars: 'loaded', mobileOverflow: false, browserErrors: errors }));
+  console.log(JSON.stringify({ url: url.href, httpStatus: 200, profiles: profiles.length, photos: Object.keys(photos).length, initials: 4, hiddenCommunityTools: 'passed', hallBranding: 'passed', search: 'passed', allProfileFieldsAndPhotoMappings: 'passed', refresh: 'passed', avatars: 'loaded', mobileOverflow: false, browserErrors: errors }));
 } finally {
   await browser.close();
 }

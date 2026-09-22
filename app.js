@@ -12,7 +12,7 @@ import { setupAdmin } from './admin.js';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
-const colors = ['#e3dfef', '#f0e6cf', '#dde6df', '#e8e6ed', '#e6e9d4', '#e8ddd4', '#dce5e9', '#efe2d9'];
+const colors = ['#e8edf8', '#f3eedf', '#e7f2f3', '#eceef4', '#e5edf6', '#f2eee8', '#e7f0f3', '#f0eef6'];
 const paths = {
   plus: '<path d="M12 5v14M5 12h14"/>',
   arrow: '<path d="M5 12h14m-5-5 5 5-5 5"/>',
@@ -40,6 +40,8 @@ const storage = {
 };
 let settings;
 try { settings = validateSettings({ ...defaults, ...storage.get('settings', {}) }); } catch { settings = validateSettings(defaults); }
+// Migrate the former default brand saved by earlier visits.
+if (['Common Ground', 'SKY Lee Hall'].includes(settings.hallName)) settings.hallName = defaults.hallName;
 let localProfiles;
 try { localProfiles = normalizeProfiles({ profiles: storage.get('previews', []) }); } catch { localProfiles = []; }
 if (!settings.backendUrl && (location.hostname.endsWith('.omgs.app') || (['localhost', '127.0.0.1'].includes(location.hostname) && location.port === '4174'))) settings.backendUrl = location.origin;
@@ -204,8 +206,8 @@ $('#join-form').addEventListener('input', e => e.target.setCustomValidity?.(''))
 async function applySettings() {
   const joinURL = hasBackend() ? new URL('?join=1', location.href).href : settings.formUrl;
   $$('[data-hall]').forEach(el => el.textContent = settings.hallName);
-  $('.brand').setAttribute('aria-label', `${settings.hallName} home`);
-  document.title = `${settings.hallName} · Your hall, together`;
+  $('.brand').setAttribute('aria-label', `Social Wall — ${settings.hallName}`);
+  document.title = `Social Wall · ${settings.hallName}`;
   $('#source-label').textContent = 'HALL WALL';
   $('#note-avatars').hidden = !!joinURL;
   $('#join-qr').hidden = !joinURL;
@@ -320,5 +322,5 @@ const admin = setupAdmin({ api, getBaseURL: () => settings.backendUrl, cardHTML,
 $('#admin-button').addEventListener('click', admin.open);
 applySettings(); render();
 if (new URLSearchParams(location.search).has('admin')) admin.open();
-if (new URLSearchParams(location.search).has('join')) joinWall();
+if (new URLSearchParams(location.search).has('join') && !$('[data-join]').hidden) joinWall();
 $('#feed-status').textContent = hasFeed() ? 'Ready when you are — press Refresh wall' : `${residentProfiles.length} resident introductions · September 2026`;

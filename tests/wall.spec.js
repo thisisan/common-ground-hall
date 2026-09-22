@@ -14,6 +14,9 @@ test('filters, search, complete profile and keyboard dismissal', async ({ page }
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto('/');
   await expect(page.locator('.profile-card')).toHaveCount(23);
+  await expect(page.locator('#create-avatar-button')).toBeHidden();
+  await expect(page.locator('#display-button')).toBeHidden();
+  await expect(page.locator('[data-join]').first()).toBeHidden();
   await page.getByRole('button', { name: 'Engineering', exact: true }).click();
   await expect(page.locator('.profile-card')).toHaveCount(9);
   await page.getByRole('searchbox').fill('old music');
@@ -33,7 +36,8 @@ test('filters, search, complete profile and keyboard dismissal', async ({ page }
 
 test('local preview requires consent, displays safely, and persists', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Join the wall', exact: true }).click();
+  // The join entry point is parked in the public UI; exercise its retained component.
+  await page.locator('[data-join]').first().evaluate(button => button.click());
   await page.locator('[name=name]').fill('Taylor <b>Hall</b>');
   await page.locator('[name=curriculum]').fill('History');
   await page.locator('[name=intro]').fill('A friendly neighbor');
@@ -97,7 +101,7 @@ test('display mode rotates current profiles and pauses without feed calls', asyn
   await page.goto('/');
   // Headless fullscreen is platform-dependent; exercise the same CSS fallback used by iframe previews.
   await page.evaluate(() => { document.documentElement.requestFullscreen = () => Promise.reject(new Error('Not available')); });
-  await page.getByRole('button', { name: 'Display mode' }).click();
+  await page.locator('#display-button').evaluate(button => button.click());
   await expect(page.locator('.profile-card')).toHaveCount(4);
   await expect(page.locator('#display-page')).toHaveText('1 / 6');
   await page.clock.fastForward(12000);
@@ -116,7 +120,8 @@ test('configured Google Form gets an actual QR code and join target', async ({ p
   await expect(page.locator('#join-qr svg')).toHaveCount(1);
   const popupPromise = page.waitForEvent('popup');
   await page.route('https://forms.gle/**', r => r.fulfill({ body: 'Google Form placeholder for test' }));
-  await page.getByRole('button', { name: 'Join the wall', exact: true }).click();
+  // The join entry point is parked in the public UI; exercise its retained component.
+  await page.locator('[data-join]').first().evaluate(button => button.click());
   const popup = await popupPromise;
   await expect(popup).toHaveURL('https://forms.gle/hall-example');
 });
@@ -134,7 +139,7 @@ test('desktop and mobile layout render without overflow or missing avatars', asy
   await page.screenshot({ path: 'evidence/mobile.png', fullPage: true, animations: 'disabled' });
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.evaluate(() => { document.documentElement.requestFullscreen = () => Promise.reject(new Error('Not available')); });
-  await page.getByRole('button', { name: 'Display mode' }).click();
+  await page.locator('#display-button').evaluate(button => button.click());
   await expect(page.locator('.profile-card')).toHaveCount(4);
   await page.screenshot({ path: 'evidence/display.png', animations: 'disabled' });
 });

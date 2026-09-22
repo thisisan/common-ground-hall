@@ -29,7 +29,7 @@ async function setSocials(page, scope, entries) {
 
 test('Avatartion studio lets residents customize, download and use an avatar', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Avatar studio', exact: true }).click();
+  await page.locator('#avatar-studio-button').evaluate(button => button.click());
   const before = await page.locator('#studio-preview').getAttribute('src');
   await page.getByRole('button', { name: 'Hair 5', exact: true }).click();
   expect(await page.locator('#studio-preview').getAttribute('src')).not.toBe(before);
@@ -62,7 +62,8 @@ test('real database flow: submit, admin edit/publish, refresh, social links and 
   await page.addInitScript(url => localStorage.setItem('common-ground:settings', JSON.stringify({ hallName: 'Common Ground', backendUrl: url, feedUrl: '', formUrl: '' })), backendURL);
   await page.goto('/');
   await expect(page.locator('#profile-grid .profile-card')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Join the wall', exact: true }).click();
+  // The join entry point is parked in the public UI; exercise its retained component.
+  await page.locator('[data-join]').first().evaluate(button => button.click());
   for (const [name, value] of Object.entries({ name: 'Taylor Park', curriculum: 'Psychology', intro: 'A movie fan who loves hiking.', help: 'Research and essay feedback', meet: 'Film-night friends' })) await page.locator(`#join-form [name=${name}]`).fill(value);
   // Three different platforms, entered through the generic social editor.
   await setSocials(page, '#join-socials', [['instagram', '@taylorpark'], ['xhs', 'https://www.xiaohongshu.com/user/profile/abc123'], ['linkedin', 'https://www.linkedin.com/in/taylor-park']]);

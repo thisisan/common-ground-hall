@@ -1,4 +1,4 @@
-# Common Ground — university hall social wall
+# Social Wall — Simon K. Y. Lee Hall, HKU
 
 A separate, responsive website inspired by the supplied profile card: monochrome Notionists avatars, warm paper, pastel portrait panels, and hall-specific introductions. Built as a single HTML file, with no external font, avatar, or JavaScript requests at runtime.
 
@@ -84,3 +84,5 @@ Browser coverage checks manual-only fetching, approval updates/removals, failure
 - Manrope font: SIL Open Font License, included in `assets/Manrope-OFL.txt`. The Latin variable font is bundled; other scripts use the system fallback.
 - QR codes generated locally with `qrcode` (MIT).
 - [Google Apps Script web apps](https://developers.google.com/apps-script/guides/web) and [JSON Content Service](https://developers.google.com/apps-script/guides/content).
+
+The public wall retains its minimalist layout with subtle Skyers blue and cyan accents. Create avatar, Display mode, Join the wall, and the related avatar/join shortcuts are temporarily hidden. Their components remain available in the code for future reactivation.
