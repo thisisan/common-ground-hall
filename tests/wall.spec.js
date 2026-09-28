@@ -63,3 +63,22 @@ test('mobile keeps filters reachable and has no horizontal overflow', async ({ p
   await expect(page.locator('#profile-detail .resident-initials')).toHaveText('R');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+
+test('official omg badge collapses and opens its illustrated dialog on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/');
+  const badge = page.getByRole('button', { name: 'What is omg?', exact: true });
+  await expect(badge).toHaveCount(1);
+  await expect(badge).toHaveAttribute('data-compact', 'true', { timeout: 8000 });
+  await badge.click();
+  const dialog = page.getByRole('dialog', { name: 'Build your ideas, all in one place.' });
+  await expect(dialog).toBeVisible();
+  await expect.poll(() => dialog.locator('img').evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
+  await expect(dialog.getByRole('link', { name: 'Start building' })).toHaveAttribute('href', 'https://omg.dev');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await dialog.getByRole('button', { name: 'Close', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  expect(errors).toEqual([]);
+});

@@ -1,3 +1,4 @@
+import '@omg-dev/sdk/brand/auto';
 import defaults from './config.json';
 import { createAPI } from './api.js';
 import { createTracker } from './analytics.js';

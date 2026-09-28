@@ -13,13 +13,14 @@
     "test": "node --test tests/feed.test.mjs && playwright test"
   },
   "dependencies": {
-    "@omg-dev/schema": "0.4.43",
-    "@omg-dev/server": "0.4.43"
+    "@omg-dev/schema": "0.4.46",
+    "@omg-dev/sdk": "0.4.46",
+    "@omg-dev/server": "0.4.46"
   },
   "devDependencies": {
     "@dicebear/core": "10.6.0",
     "@dicebear/styles": "10.6.0",
-    "@omg-dev/vite-plugin": "0.4.43",
+    "@omg-dev/vite-plugin": "0.4.46",
     "@playwright/test": "^1.58.2",
     "esbuild": "^0.28.2",
     "qrcode": "^1.5.4",
