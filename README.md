@@ -21,9 +21,9 @@ GitHub Pages serves `docs/` on `main`. Publish the reviewed source and regenerat
 
 ## Backend and staff dashboard
 
-omg.dev wall: https://sky-lee-social-wall-0d0t5.omgs.app/
+omg.dev wall: https://skyleesocialwall.omgs.app/
 
-Staff dashboard: https://sky-lee-social-wall-0d0t5.omgs.app/?admin=1
+Staff dashboard: https://skyleesocialwall.omgs.app/?admin=1
 
 Both public addresses use the same persistent backend. Staff can add profiles, upload/remove pictures, edit details, publish/unpublish and delete. Students can only browse published profiles. The initial reviewed snapshot seeds the database once; later deployments preserve staff changes.
 

@@ -1,8 +1,8 @@
 # omg.dev deployment
 
-Public wall: https://sky-lee-social-wall-0d0t5.omgs.app/
+Public wall: https://skyleesocialwall.omgs.app/
 
-Staff dashboard: https://sky-lee-social-wall-0d0t5.omgs.app/?admin=1
+Staff dashboard: https://skyleesocialwall.omgs.app/?admin=1
 
 The existing GitHub Pages site uses the same backend through `config.json`. The public wall loads published profiles when opened; staff changes appear when a visitor reloads. There is no public submission form. Staff sign in to add profiles, upload/remove pictures, edit full responses and contact links, publish/unpublish, and delete profiles.
 
@@ -32,6 +32,6 @@ Events contain only event type, a source group and the random session identifier
 
 The generated staff password is in the ignored `.omg/admin-access.txt`; its salted scrypt hash is in ignored `.env.local`. Neither is committed or sent to the public client. Deliver the password privately to the organizer.
 
-Runtime settings are `HALL_ADMIN_PASSWORD_HASH` and `HALL_ALLOWED_ORIGINS`. The latter must include BOTH `https://thisisan.github.io` and `https://sky-lee-social-wall-0d0t5.omgs.app`: the hosting proxy rewrites the internal request origin. Setting environment values requires redeployment to take effect. Use the omg.dev app dashboard or the Cloud environment API; never put secrets into `config.json`.
+Runtime settings are `HALL_ADMIN_PASSWORD_HASH` and `HALL_ALLOWED_ORIGINS`. The latter must include BOTH `https://thisisan.github.io` and `https://skyleesocialwall.omgs.app`: the hosting proxy rewrites the internal request origin. Setting environment values requires redeployment to take effect. Use the omg.dev app dashboard or the Cloud environment API; never put secrets into `config.json`.
 
 The Computer's Cloud OAuth authorization was restored through the shared browser. A website login alone does not renew its hosting session: complete Cloud authorization and verify `omg_whoami` before deploying.
