@@ -6,7 +6,7 @@ Live site: https://thisisan.github.io/common-ground-hall/
 
 ## Reviewed profiles
 
-The September 28, 2026 snapshot contains 26 profiles and 21 matched pictures. Raven retains his profile with an initial instead of a picture, as requested. See [RESIDENT-IMPORT.md](RESIDENT-IMPORT.md). Registration sheets and private identifiers are never bundled. Source-sheet changes require a reviewed import and deployment; they do not sync automatically.
+The September 28, 2026 snapshot contains 26 profiles and 21 matched pictures. Raven retains his profile with an initial instead of a picture, as requested. See [RESIDENT-IMPORT.md](RESIDENT-IMPORT.md). Registration sheets and private identifiers are never bundled. Source-sheet changes do not sync automatically. Staff can maintain profiles through the dashboard; a source-sheet refresh requires a reviewed import.
 
 ## Build and verify
 
@@ -19,11 +19,15 @@ SITE_URL=https://thisisan.github.io/common-ground-hall/ node scripts/check-live.
 
 GitHub Pages serves `docs/` on `main`. Publish the reviewed source and regenerated `docs/` to `thisisan/common-ground-hall`. `npm start` serves the local `dist/` build on port 4173.
 
-## Backend and analytics status
+## Backend and staff dashboard
 
-The live site currently serves the reviewed snapshot. It does not collect visitor analytics. omg.dev deployment requires restoring the hosting account connection, which currently returns `Session refresh failed (400): session not found`.
+omg.dev wall: https://sky-lee-social-wall-0d0t5.omgs.app/
 
-Backend/admin modules remain in the repository for the next deployment, but are not connected to the public wall. The intended backend will allow only hall staff to upload/manage profiles and will provide aggregate visits, page views, referral sources, profile opens and contact interactions. The removed public join, avatar and setup tools are not part of the visitor interface.
+Staff dashboard: https://sky-lee-social-wall-0d0t5.omgs.app/?admin=1
+
+Both public addresses use the same persistent backend. Staff can add profiles, upload/remove pictures, edit details, publish/unpublish and delete. Students can only browse published profiles. The initial reviewed snapshot seeds the database once; later deployments preserve staff changes.
+
+The staff dashboard reports aggregate visits, page views, source groups, profile opens and contact interactions. It does not collect resident names, profile IDs, contact details or searches. Analytics respect Do Not Track and Global Privacy Control. See [DEPLOY-OMG.md](DEPLOY-OMG.md) for deployment, private staff access, storage and metric definitions.
 
 ## Assets
 

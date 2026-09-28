@@ -1,0 +1,43 @@
+import {test,expect} from '@playwright/test';
+import {spawn} from 'node:child_process';
+import {scryptSync} from 'node:crypto';
+import {mkdtempSync,rmSync,readFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+const url='http://127.0.0.1:4174';const password='local-test-only';let server,folder;
+test.describe.configure({mode:'serial'});
+test.beforeAll(async()=>{
+ folder=mkdtempSync(join(tmpdir(),'sky-staff-'));
+ server=spawn('bun',['scripts/serve-backend.ts'],{env:{...process.env,PORT:'4174',HALL_DB_PATH:join(folder,'test.db'),HALL_ADMIN_PASSWORD_HASH:`scrypt:test:${scryptSync(password,'test',64).toString('hex')}`},stdio:'ignore'});
+ await expect.poll(async()=>{try{return(await fetch(`${url}/api/hall?view=health`)).status;}catch{return 0;}}).toBe(200);
+});
+test.afterAll(async()=>{if(server&&server.exitCode===null){server.kill();await new Promise(r=>server.once('exit',r));}if(folder)rmSync(folder,{recursive:true,force:true});});
+test('staff manage profiles and pictures; visitor activity reaches the private dashboard',async({page})=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(url);await expect(page.locator('#profile-grid .profile-card')).toHaveCount(26);
+ await page.getByRole('button',{name:'Contact Raven',exact:true}).click();await page.keyboard.press('Escape');
+ await page.getByRole('button',{name:'Meet Ethan',exact:true}).click();await page.keyboard.press('Escape');
+ await page.goto(`${url}/?admin=1`);await page.getByLabel('Password',{exact:true}).fill(password);await page.getByRole('button',{name:'Sign in',exact:true}).click();
+ await expect(page.locator('#staff-rows .admin-row')).toHaveCount(26);
+ await expect(page.locator('#staff-metrics > div').filter({hasText:'Contact details opened'}).locator('strong')).toHaveText('1');
+ await page.getByRole('button',{name:'Add profile',exact:true}).click();
+ for(const [label,value] of [['Preferred name','Staff test'],['Field of study','Law'],['I am','A test introduction'],['I can help with','Full response '.repeat(30)],['I want to meet','Test hallmates'],['Public contact details','Email: test@example.com\nWeChat: test-account']])await page.getByLabel(label,{exact:true}).fill(value);
+ await page.getByLabel('Category',{exact:true}).selectOption('Law');
+ const photos=JSON.parse(readFileSync(new URL('../assets/resident-photos.json',import.meta.url)));
+ await page.locator('#staff-photo').setInputFiles({name:'test.webp',mimeType:'image/webp',buffer:Buffer.from(photos['resident-1'].split(',')[1],'base64')});
+ await expect(page.locator('#staff-photo-preview img')).toBeVisible();await page.getByRole('checkbox').check();await page.getByRole('button',{name:'Save draft',exact:true}).click();await expect(page.locator('.staff-editor')).toBeHidden();
+ const row=page.locator('#staff-rows .admin-row').filter({hasText:'Staff test'});await expect(row).toContainText('pending');
+ expect((await(await fetch(`${url}/api/hall`)).json()).profiles).toHaveLength(26);
+ await row.getByRole('button',{name:'Manage'}).click();await page.getByRole('button',{name:'Publish',exact:true}).click();await expect(row).toContainText('published');
+ let data=(await(await fetch(`${url}/api/hall`)).json()).profiles;expect(data).toHaveLength(27);expect(data.find(p=>p.name==='Staff test').photo).toMatch(/^data:image\/webp/);
+ await row.getByRole('button',{name:'Manage'}).click();await page.getByRole('button',{name:'Remove picture',exact:true}).click();await page.getByRole('button',{name:'Save changes',exact:true}).click();await expect(page.locator('.staff-editor')).toBeHidden();
+ data=(await(await fetch(`${url}/api/hall`)).json()).profiles;const saved=data.find(p=>p.name==='Staff test');expect(saved.photo).toBe('');expect(saved.help).toBe('Full response '.repeat(30).trim());expect(saved.contact).toContain('\n');
+ await row.getByRole('button',{name:'Manage'}).click();await page.locator('.staff-editor summary').click();await page.getByLabel('Type DELETE',{exact:true}).fill('DELETE');await page.getByRole('button',{name:'Delete permanently',exact:true}).click();await expect(row).toHaveCount(0);
+ expect((await(await fetch(`${url}/api/hall`)).json()).profiles).toHaveLength(26);
+ await page.getByRole('button',{name:'Sign out',exact:true}).click();await expect(page.locator('#staff-login')).toBeVisible();expect(errors).toEqual([]);
+});
+test('Do Not Track prevents analytics without blocking profile browsing',async({page})=>{
+ await page.addInitScript(()=>Object.defineProperty(navigator,'doNotTrack',{value:'1'}));
+ const tracking=[];page.on('request',r=>{if(r.method()==='POST'&&r.postData()?.includes('"action":"track"'))tracking.push(r.postData());});
+ await page.goto(url);await expect(page.locator('#profile-grid .profile-card')).toHaveCount(26);await page.getByRole('button',{name:'Meet Raven',exact:true}).click();expect(tracking).toEqual([]);
+});

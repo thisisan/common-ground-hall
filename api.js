@@ -1,6 +1,6 @@
 export function createAPI(getBaseURL) {
   return async (action, values = {}) => {
-    const base = getBaseURL(); if (!base) throw new Error('Connect your omg.dev backend in Wall setup first.');
+    const base = getBaseURL(); if (!base) throw new Error('Staff management is unavailable until the hall backend is connected.');
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 20000);
     try {

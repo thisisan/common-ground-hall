@@ -1,6 +1,7 @@
 import { createHallBackend } from '../backend/hall';
+import { residentProfiles } from '../residents.js';
 import { resolve } from 'node:path';
-const backend = createHallBackend();
+const backend = createHallBackend({ seedProfiles: process.env.HALL_SKIP_SEED ? undefined : residentProfiles });
 const port = Number(process.env.PORT || 4174);
 Bun.serve({ port, hostname: '0.0.0.0', async fetch(request) {
   const url = new URL(request.url);
@@ -9,4 +10,4 @@ Bun.serve({ port, hostname: '0.0.0.0', async fetch(request) {
   if (url.pathname === '/' || url.pathname === '/index.html') return new Response(Bun.file(resolve('dist/index.html')), { headers: { 'Content-Type': 'text/html' } });
   return new Response('Not found', { status: 404 });
 } });
-console.log(`Common Ground backend and wall: http://localhost:${port}`);
+console.log(`SKY Lee Social Wall backend and wall: http://localhost:${port}`);

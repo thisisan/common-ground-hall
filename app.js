@@ -1,3 +1,7 @@
+import defaults from './config.json';
+import { createAPI } from './api.js';
+import { createTracker } from './analytics.js';
+import { mountStaff } from './staff.js';
 import { residentProfiles } from './residents.js';
 import { SOCIAL_PLATFORMS, socialHref, socialText } from './social-schema.js';
 import avatars from './assets/avatars.json';
@@ -27,7 +31,12 @@ const paths = {
 function icon(name) { return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.person}</svg>`; }
 $$('[data-icon]').forEach(el => el.outerHTML = icon(el.dataset.icon));
 const escape = (value) => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-let profiles = residentProfiles;
+const hosted = location.hostname.endsWith('.omgs.app') || (['localhost','127.0.0.1'].includes(location.hostname) && location.port === '4174');
+const backendURL = hosted ? location.origin : defaults.backendUrl;
+const staffMode = new URLSearchParams(location.search).get('admin') === '1';
+const track = createTracker(backendURL, { disabled: staffMode });
+let profiles = backendURL ? [] : residentProfiles;
+let loading = !!backendURL;
 let filter = 'All';
 let query = '';
 function avatar(index, config = null) { return `<img src="${config ? avatarURI(config) : avatars[Math.abs(Number(index) || 0) % avatars.length]}" alt="" draggable="false">`; }
@@ -67,7 +76,8 @@ function render() {
   $('#resident-count').textContent = String(profiles.length);
   $('#hero-count').textContent = `${profiles.length} SKYers`;
   $('#result-line').textContent = query || filter !== 'All' ? `${visible.length} ${visible.length === 1 ? 'SKYer' : 'SKYers'} found` : '';
-  $('#empty-state').hidden = !!visible.length;
+  $('#empty-state').hidden = loading || !!visible.length;
+  $('#note-avatars').innerHTML = profiles.slice(0, 3).map(profileAvatar).join('');
   $('#mini-avatars').innerHTML = profiles.slice(0, 4).map(profileAvatar).join('');
 }
 $('#note-avatars').innerHTML = profiles.slice(0, 3).map(profileAvatar).join('');
@@ -84,6 +94,7 @@ $('#profile-grid').addEventListener('click', e => {
   $('#profile-detail').innerHTML = cardHTML(p, true);
   $('#profile-dialog').setAttribute('aria-labelledby', 'profile-name');
   $('#profile-dialog').showModal();
+  track(button.classList.contains('contact-button') ? 'contact_open' : 'profile_open');
 });
 $$('[data-filter]').forEach(button => button.addEventListener('click', () => {
   filter = button.dataset.filter;
@@ -93,3 +104,38 @@ $$('[data-filter]').forEach(button => button.addEventListener('click', () => {
 $('#search').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); render(); });
 $('#reset-filters').addEventListener('click', () => { $('#search').value = ''; query = ''; $('[data-filter="All"]').click(); });
 render();
+
+document.addEventListener('click', e => {
+  if (e.target.closest('a.social-chip')) track('contact_click');
+});
+let fetching = false;
+async function loadWall() {
+  if (!backendURL || fetching) return;
+  fetching = true;
+  try {
+    const response = await fetch(`${backendURL}/api/hall`, { cache:'no-store', credentials:'omit', signal:AbortSignal.timeout(15000) });
+    if (!response.ok) throw new Error('Wall unavailable');
+    const result = await response.json();
+    if (!Array.isArray(result.profiles)) throw new Error('Invalid wall response');
+    profiles = result.profiles;
+    loading = false; render();
+    $('#refresh-group').hidden = true;
+    $('#feed-status').textContent = '';
+  } catch {
+    loading = false;
+    $('#refresh-group').hidden = false;
+    $('#feed-status').textContent = 'Couldn’t load the wall. Please try again.';
+  } finally { fetching = false; }
+}
+$('#refresh-button').addEventListener('click', loadWall);
+if (staffMode) {
+  mountStaff({api:createAPI(() => backendURL), escape, photoHTML:profileAvatar, onClose:() => { const url=new URL(location.href);url.searchParams.delete('admin');location.href=url.href; }});
+} else {
+  track('page_view');
+  void loadWall();
+}
+if (backendURL) {
+  const note=document.createElement('details');note.className='privacy-note';
+  note.innerHTML='<summary>Privacy</summary><p>We count visits, page views, traffic sources, profile opens and contact interactions to understand how the wall is used. Analytics do not include names, profile IDs, contact details or search text. A random browser-tab identifier groups activity into visits; no analytics cookies or fingerprinting are used. Do Not Track and Global Privacy Control are respected.</p>';
+  document.querySelector('footer').append(note);
+}

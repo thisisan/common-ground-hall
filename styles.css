@@ -73,3 +73,5 @@ footer{color:var(--muted)}
 @media(max-width:380px){.brand small{font-size:8px}}
 
 #note-avatars .resident-initials{width:82px;height:82px;flex-shrink:0;font-size:30px;border-radius:50%;background:#e6edf7;border:1.5px solid var(--ink);margin-left:-12px}
+.staff-metrics{margin:32px 0;padding:24px;border:1px solid var(--border);border-radius:12px;background:white}#staff-metrics{display:flex;flex-wrap:wrap;gap:24px;margin:20px 0}#staff-metrics>div{display:flex;flex-direction:column;gap:6px;min-width:110px}#staff-metrics strong{font-size:28px}#staff-metrics span,#staff-sources{font-size:13px;color:var(--muted)}.staff-editor{max-width:720px;width:calc(100% - 32px)}.staff-editor textarea{resize:vertical}.staff-editor .admin-avatar{margin:12px 0}.admin-avatar .resident-initials{font-size:18px}.staff-editor .review-actions{margin-top:20px;display:flex;justify-content:space-between}#staff-login button{margin-top:18px}#staff-rows .admin-row{min-height:76px}
+.privacy-note{max-width:420px;font-size:12px}.privacy-note summary{cursor:pointer}.privacy-note p{line-height:1.7;color:var(--muted)}

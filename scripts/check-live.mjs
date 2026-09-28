@@ -2,6 +2,7 @@
 // that origin; it is never saved, printed, or sent to third-party sites.
 import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
+import { expect } from '@playwright/test';
 import { mkdir, readFile } from 'node:fs/promises';
 const profiles = JSON.parse(await readFile(new URL('../assets/resident-profiles.json', import.meta.url)));
 const photos = JSON.parse(await readFile(new URL('../assets/resident-photos.json', import.meta.url)));
@@ -17,8 +18,9 @@ try {
   }
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  const response = await page.goto(url.href, { waitUntil: 'networkidle' });
+  const response = await page.goto(url.href, { waitUntil: 'domcontentloaded', timeout: 60000 });
   assert.equal(response.status(), 200);
+  await expect(page.locator('#profile-grid .profile-card')).toHaveCount(profiles.length, { timeout: 20000 });
   assert.equal(await page.title(), 'SKY Lee Social Wall · Simon K. Y. Lee Hall, HKU');
   assert.equal(await page.locator('.profile-card').count(), profiles.length);
   for (const selector of ['#create-avatar-button', '#display-button', '#avatar-studio-button', '[data-join]']) {

@@ -3,6 +3,10 @@ import { readFileSync } from 'node:fs';
 const profiles = JSON.parse(readFileSync(new URL('../assets/resident-profiles.json', import.meta.url)));
 const photos = JSON.parse(readFileSync(new URL('../assets/resident-photos.json', import.meta.url)));
 
+test.beforeEach(async ({ page }) => {
+  await page.route('https://*.omgs.app/api/hall', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(route.request().method()==='GET'?{profiles:profiles.map(p=>({...p,photo:photos[p.id]||'',imported:true}))}:{ok:true})}));
+});
+
 test('public wall uses the hall brand and contains no student submission or setup flow', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('common-ground:previews', JSON.stringify([{name:'Old browser preview'}])));
   await page.goto('/?join=1');

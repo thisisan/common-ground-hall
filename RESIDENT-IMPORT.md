@@ -20,4 +20,4 @@ New profiles Will, Esper and Daisy each have a matching uploaded picture. All do
 
 ## Publication
 
-This is a staff-reviewed static snapshot. Students cannot upload profiles on the site. New registrations and corrections require another reviewed import and deployment. No private source workbook or raw registration response is committed or served.
+This staff-reviewed snapshot seeds the persistent omg.dev backend once. Students cannot upload profiles. Staff can add profiles and corrections through the private dashboard; the original spreadsheet is not automatically synced. No private source workbook or raw registration response is committed or served.
