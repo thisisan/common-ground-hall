@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 const password = 'test-only-password-not-for-deployment';
 const hash = passwordHash(password);
-const profile = { name: 'Test Resident', curriculum: 'History', category: 'Other', year: 'Year 2', intro: 'A friendly neighbor', help: 'Essay feedback', meet: 'Study buddies', handle: 'resident', xhs: 'https://www.xiaohongshu.com/user/profile/abc123', linkedin: 'https://www.linkedin.com/in/test-resident', avatarConfig: defaultAvatar, consent: true };
+const profile = { name: 'Test Resident', curriculum: 'History', category: 'Others', year: 'Year 2', intro: 'A friendly neighbor', help: 'Essay feedback', meet: 'Study buddies', handle: 'resident', xhs: 'https://www.xiaohongshu.com/user/profile/abc123', linkedin: 'https://www.linkedin.com/in/test-resident', avatarConfig: defaultAvatar, consent: true };
 function setup(path = ':memory:') {
   const backend = createHallBackend({ dbPath: path, adminPasswordHash: hash, allowedOrigins: ['https://thisisan.github.io'] });
   async function call(action?: string, values = {}, origin?: string) {

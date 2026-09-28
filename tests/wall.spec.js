@@ -1,163 +1,61 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+const profiles = JSON.parse(readFileSync(new URL('../assets/resident-profiles.json', import.meta.url)));
+const photos = JSON.parse(readFileSync(new URL('../assets/resident-photos.json', import.meta.url)));
 
-const feedUrl = 'https://script.google.com/macros/s/test-wall/exec';
-const profile = { id: 'test-1', name: 'New Neighbor', curriculum: 'Chemistry', category: 'Science', year: 'Year 2', intro: 'I like coffee', help: 'Chemistry', meet: 'Study buddies', handle: 'neighbor', avatar: 1 };
-async function configure(page, formUrl = '') {
-  await page.getByRole('button', { name: 'Wall setup' }).click();
-  await page.locator('[name=hallName]').fill('Maple Hall');
-  await page.locator('[name=feedUrl]').fill(feedUrl);
-  await page.locator('[name=formUrl]').fill(formUrl);
-  await page.getByRole('button', { name: 'Save settings' }).click();
-}
+test('public wall uses the hall brand and contains no student submission or setup flow', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('common-ground:previews', JSON.stringify([{name:'Old browser preview'}])));
+  await page.goto('/?join=1');
+  await expect(page).toHaveTitle('SKY Lee Social Wall · Simon K. Y. Lee Hall, HKU');
+  await expect(page.locator('#profile-grid .profile-card')).toHaveCount(profiles.length);
+  await expect(page.locator('form, #join-dialog, #settings-button, #admin-button, #create-avatar-button, #display-button')).toHaveCount(0);
+  await expect(page.getByText('Old browser preview')).toHaveCount(0);
+  await expect(page.locator('.filters button')).toHaveText(['All', 'Arts & Design', 'Business', 'Engineering', 'Science', 'Medic', 'Law', 'Others']);
+});
 
-test('filters, search, complete profile and keyboard dismissal', async ({ page }) => {
+test('filters and search work together and reset the empty state', async ({ page }) => {
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto('/');
-  await expect(page.locator('.profile-card')).toHaveCount(23);
-  await expect(page.locator('#create-avatar-button')).toBeHidden();
-  await expect(page.locator('#display-button')).toBeHidden();
-  await expect(page.locator('[data-join]').first()).toBeHidden();
-  await page.getByRole('button', { name: 'Engineering', exact: true }).click();
-  await expect(page.locator('.profile-card')).toHaveCount(9);
+  for (const category of ['Engineering', 'Medic', 'Law', 'Others']) {
+    await page.getByRole('button', { name: category, exact: true }).click();
+    await expect(page.locator('.profile-card')).toHaveCount(profiles.filter(p => p.category === category).length);
+  }
+  await page.getByRole('button', { name: 'All', exact: true }).click();
   await page.getByRole('searchbox').fill('old music');
   await expect(page.locator('.profile-card')).toHaveCount(1);
   await page.getByRole('button', { name: 'Meet Anh Minh', exact: true }).click();
   await expect(page.locator('#profile-dialog')).toBeVisible();
-  await expect(page.locator('#profile-dialog')).toContainText('May or may not soft cosplay');
   await page.keyboard.press('Escape');
-  await expect(page.locator('#profile-dialog')).not.toBeVisible();
-  await expect(page.getByRole('button', { name: 'Meet Anh Minh', exact: true })).toBeFocused();
-  await page.getByRole('searchbox').fill('no-one-at-all');
+  await expect(page.locator('#profile-dialog')).toBeHidden();
+  await page.getByRole('searchbox').fill('no matching resident 999');
   await expect(page.locator('#empty-state')).toBeVisible();
-  await page.getByRole('button', { name: 'Show everyone' }).click();
-  await expect(page.locator('.profile-card')).toHaveCount(23);
+  await page.getByRole('button', { name: 'Show all', exact: true }).click();
+  await expect(page.locator('.profile-card')).toHaveCount(profiles.length);
   expect(errors).toEqual([]);
 });
 
-test('local preview requires consent, displays safely, and persists', async ({ page }) => {
+test('every imported profile keeps its full responses and correct picture, with Raven image removed', async ({ page }) => {
   await page.goto('/');
-  // The join entry point is parked in the public UI; exercise its retained component.
-  await page.locator('[data-join]').first().evaluate(button => button.click());
-  await page.locator('[name=name]').fill('Taylor <b>Hall</b>');
-  await page.locator('[name=curriculum]').fill('History');
-  await page.locator('[name=intro]').fill('A friendly neighbor');
-  await page.locator('[name=help]').fill('Essay feedback');
-  await page.locator('[name=meet]').fill('Hiking buddies');
-  await page.getByRole('button', { name: 'Try another avatar' }).click();
-  await page.getByRole('button', { name: 'Preview my profile' }).click();
-  await expect(page.locator('#join-dialog')).toBeVisible();
-  await page.locator('[name=consent]').check();
-  await page.getByRole('button', { name: 'Preview my profile' }).click();
-  await expect(page.locator('.profile-card')).toHaveCount(24);
-  await expect(page.locator('.profile-card').first()).toContainText('Taylor <b>Hall</b>');
-  await expect(page.locator('.profile-card b')).toHaveCount(0);
-  await page.reload();
-  await expect(page.locator('.profile-card')).toHaveCount(24);
+  await expect(page.locator('#profile-grid .resident-photo')).toHaveCount(Object.keys(photos).length);
+  expect(photos['resident-2']).toBeUndefined();
+  for (const p of profiles) {
+    await page.getByRole('button', { name: `Contact ${p.name}`, exact: true }).click();
+    await expect(page.locator('#profile-detail h3')).toHaveText(p.name);
+    await expect(page.locator('#profile-detail .profile-field p')).toHaveText([p.intro,p.help,p.meet,p.contact]);
+    if (photos[p.id]) await expect(page.locator('#profile-detail .resident-photo')).toHaveAttribute('src',photos[p.id]);
+    else await expect(page.locator('#profile-detail .resident-initials')).toHaveCount(1);
+    await page.keyboard.press('Escape');
+  }
 });
 
-test('feed is requested only by refresh; changes replace data and errors retain it', async ({ page }) => {
-  let requests = 0;
-  let payload = { profiles: [profile] };
-  let failure = false;
-  await page.route('https://script.google.com/**', route => {
-    requests++;
-    return route.fulfill({ status: failure ? 503 : 200, contentType: 'application/json', body: JSON.stringify(payload) });
-  });
-  await page.clock.install();
+test('mobile keeps filters reachable and has no horizontal overflow', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
   await page.goto('/');
-  await configure(page);
-  await expect(page.locator('.profile-card')).toHaveCount(0);
-  await page.clock.fastForward(120000);
-  expect(requests).toBe(0);
-  await page.getByRole('button', { name: 'Refresh wall', exact: true }).first().click();
-  await expect(page.locator('.profile-card')).toHaveCount(1);
-  expect(requests).toBe(1);
-  await page.clock.fastForward(120000);
-  expect(requests).toBe(1);
-  await page.getByRole('button', { name: 'Refresh wall', exact: true }).first().click();
-  await expect(page.locator('#toast')).toContainText('All caught up');
-  await expect(page.locator('.profile-card')).toHaveCount(1);
-  payload = { profiles: [{ ...profile, intro: 'Updated intro' }, { ...profile, id: 'test-2', name: 'Another Resident' }] };
-  await page.getByRole('button', { name: 'Refresh wall', exact: true }).first().click();
-  await expect(page.locator('.profile-card')).toHaveCount(2);
-  await expect(page.locator('.profile-card').first()).toContainText('Updated intro');
-  failure = true;
-  await page.getByRole('button', { name: 'Refresh wall', exact: true }).first().click();
-  await expect(page.locator('#feed-status')).toContainText('Current wall kept');
-  await expect(page.locator('.profile-card')).toHaveCount(2);
-  failure = false; payload = { profiles: [] };
-  await page.getByRole('button', { name: 'Refresh wall', exact: true }).first().click();
-  await expect(page.locator('.profile-card')).toHaveCount(0);
-  await expect(page.locator('#toast')).toContainText('2 removed');
-  const before = requests;
-  await page.reload(); await page.clock.fastForward(120000);
-  expect(requests).toBe(before);
-});
-
-test('display mode rotates current profiles and pauses without feed calls', async ({ page }) => {
-  const requests = [];
-  page.on('request', r => { if (r.url().includes('script.google.com')) requests.push(r.url()); });
-  await page.clock.install();
-  await page.goto('/');
-  // Headless fullscreen is platform-dependent; exercise the same CSS fallback used by iframe previews.
-  await page.evaluate(() => { document.documentElement.requestFullscreen = () => Promise.reject(new Error('Not available')); });
-  await page.locator('#display-button').evaluate(button => button.click());
-  await expect(page.locator('.profile-card')).toHaveCount(4);
-  await expect(page.locator('#display-page')).toHaveText('1 / 6');
-  await page.clock.fastForward(12000);
-  await expect(page.locator('#display-page')).toHaveText('2 / 6');
-  await page.getByRole('button', { name: 'Pause rotation' }).click();
-  await page.clock.fastForward(36000);
-  await expect(page.locator('#display-page')).toHaveText('2 / 6');
-  await page.getByRole('button', { name: 'Exit display' }).click();
-  await expect(page.locator('.profile-card')).toHaveCount(23);
-  expect(requests).toHaveLength(0);
-});
-
-test('configured Google Form gets an actual QR code and join target', async ({ page }) => {
-  await page.goto('/');
-  await configure(page, 'https://forms.gle/hall-example');
-  await expect(page.locator('#join-qr svg')).toHaveCount(1);
-  const popupPromise = page.waitForEvent('popup');
-  await page.route('https://forms.gle/**', r => r.fulfill({ body: 'Google Form placeholder for test' }));
-  // The join entry point is parked in the public UI; exercise its retained component.
-  await page.locator('[data-join]').first().evaluate(button => button.click());
-  const popup = await popupPromise;
-  await expect(popup).toHaveURL('https://forms.gle/hall-example');
-});
-
-test('desktop and mobile layout render without overflow or missing avatars', async ({ page }) => {
-  await page.goto('/');
-  await page.evaluate(() => document.fonts.ready);
-  await expect(page.locator('.profile-card')).toHaveCount(23);
-  const loaded = await page.locator('img').evaluateAll(images => images.every(img => img.complete && img.naturalWidth > 0));
-  expect(loaded).toBe(true);
-  await page.screenshot({ path: 'evidence/desktop.png', fullPage: true, animations: 'disabled' });
-  await page.screenshot({ path: 'evidence/desktop-first-screen.png', animations: 'disabled' });
-  await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.screenshot({ path: 'evidence/mobile.png', fullPage: true, animations: 'disabled' });
-  await page.setViewportSize({ width: 1920, height: 1080 });
-  await page.evaluate(() => { document.documentElement.requestFullscreen = () => Promise.reject(new Error('Not available')); });
-  await page.locator('#display-button').evaluate(button => button.click());
-  await expect(page.locator('.profile-card')).toHaveCount(4);
-  await page.screenshot({ path: 'evidence/display.png', animations: 'disabled' });
-});
-
-test('resident pictures, missing-picture initials, and complete contact details', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.locator('#source-label')).toHaveText('HALL WALL');
-  await expect(page.locator('#profile-grid .resident-photo')).toHaveCount(18);
-  await expect(page.locator('#profile-grid .resident-initials')).toHaveCount(5);
-  await expect(page.locator('#profile-grid')).not.toContainText('Alex Chan');
-  await page.getByRole('button', { name: 'Contact Héctor', exact: true }).click();
-  await expect(page.locator('#profile-detail')).toContainText('Instagram/PlayStation/Xbox: hechss');
-  await expect(page.locator('#profile-detail')).toContainText('Spanish/Catalan/German/Italian/French practise');
-  await page.keyboard.press('Escape');
-  await page.getByRole('button', { name: 'Meet Anh Minh', exact: true }).click();
-  await expect(page.locator('#profile-detail')).toContainText('May or may not soft cosplay');
-  await page.keyboard.press('Escape');
-  await page.getByRole('button', { name: 'Meet Rebecca', exact: true }).click();
+  await page.getByRole('button', {name:'Others',exact:true}).click();
+  await expect(page.locator('[data-filter="Others"]')).toHaveAttribute('aria-pressed','true');
+  await page.getByRole('button',{name:'All',exact:true}).click();
+  await page.getByRole('button',{name:'Contact Raven',exact:true}).click();
   await expect(page.locator('#profile-detail .resident-initials')).toHaveText('R');
-  await expect(page.locator('#profile-detail')).toContainText('instagram rrrbk0131');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

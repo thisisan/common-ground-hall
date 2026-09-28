@@ -40,7 +40,7 @@ test('Malformed feeds and duplicate IDs are rejected, and unsafe handles are rem
   assert.throws(() => normalizeProfiles({ error: 'No sheet', profiles: [] }));
   assert.throws(() => normalizeProfiles({ profiles: [{ id: '1', name: 'A' }, { id: '1', name: 'B' }] }));
   const [p] = normalizeProfiles({ profiles: [{ name: '<script>hello</script>', handle: 'https://evil.test', category: '<img>', avatar: -1 }] });
-  assert.equal(p.handle, ''); assert.equal(p.category, 'Other'); assert.equal(p.avatar, 0);
+  assert.equal(p.handle, ''); assert.equal(p.category, 'Others'); assert.equal(p.avatar, 0);
 });
 test('Settings accept Google endpoints and reject arbitrary or unsafe schemes', () => {
   assert.ok(validateSettings({ feedUrl: 'https://script.google.com/macros/s/example/exec' }).feedUrl);
@@ -50,7 +50,7 @@ test('Settings accept Google endpoints and reject arbitrary or unsafe schemes', 
 });
 
 // --- Generic social accounts -------------------------------------------------
-const base = { name: 'Sam Reed', curriculum: 'History', category: 'Other', year: 'Year 2', intro: 'Hello', help: 'Notes', meet: 'Friends', consent: true, avatarConfig: defaultAvatar };
+const base = { name: 'Sam Reed', curriculum: 'History', category: 'Others', year: 'Year 2', intro: 'Hello', help: 'Notes', meet: 'Friends', consent: true, avatarConfig: defaultAvatar };
 
 test('Several different social platforms are accepted and mirrored to legacy fields', () => {
   const p = validateSubmission({ ...base, socials: [

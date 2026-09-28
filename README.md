@@ -1,88 +1,30 @@
-# Social Wall — Simon K. Y. Lee Hall, HKU
+# SKY Lee Social Wall
 
-A separate, responsive website inspired by the supplied profile card: monochrome Notionists avatars, warm paper, pastel portrait panels, and hall-specific introductions. Built as a single HTML file, with no external font, avatar, or JavaScript requests at runtime.
+A read-only social wall for Simon K. Y. Lee Hall, HKU, with a minimalist layout and subtle hall blue accents. Students browse SKYers, search shared interests, filter fields of study, and open contact details. Profiles are uploaded and published by hall staff; there is no student submission form or browser-local preview flow.
 
-## Hosted site
+Live site: https://thisisan.github.io/common-ground-hall/
 
-Public site: https://thisisan.github.io/common-ground-hall/
+## Reviewed profiles
 
-Source repository: https://github.com/thisisan/common-ground-hall
+The September 28, 2026 snapshot contains 26 profiles and 21 matched pictures. Raven retains his profile with an initial instead of a picture, as requested. See [RESIDENT-IMPORT.md](RESIDENT-IMPORT.md). Registration sheets and private identifiers are never bundled. Source-sheet changes require a reviewed import and deployment; they do not sync automatically.
 
-GitHub Pages serves the committed `docs/` folder on `main`. To publish changes, run `npm ci && npm run build:pages`, commit the updated source and `docs/`, then push to `main`. It includes the reviewed SKY Lee Hall snapshot: 23 residents and 18 uploaded pictures. See [RESIDENT-IMPORT.md](RESIDENT-IMPORT.md) for import details and missing pictures. Updates to Google Sheets are not automatically synced; rebuild and publish a reviewed snapshot, or configure an omg.dev backend or Apps Script feed. Only the hall site is included in its public repository.
-
-Verify the deployed page with `SITE_URL=https://thisisan.github.io/common-ground-hall/ node scripts/check-live.mjs`. The check exercises the actual hosted site and saves `evidence/hosted-desktop.png`.
-
-## Run it
+## Build and verify
 
 ```sh
-cd social-wall
 npm ci
-npm run build
-npm start
-```
-
-Open http://localhost:4173. Deploy `dist/index.html` to any static web host. The source `index.html` is a build template; use the built file to preview or publish. This project does not alter the other websites in this repository.
-
-## What works
-
-- Responsive resident wall with course filters and name/skill/interest search.
-- Full profile dialog, Instagram links, keyboard controls, and reduced-motion support.
-- Join form with a full Avatartion editor, Instagram, XHS and LinkedIn fields, and consent. Without a connected backend it uses clearly labeled browser-local persistence. Sample profiles are explicitly labeled and are not shared with other visitors.
-- Join opens the resident form for a connected backend, or an optional Google Form. A QR code links residents to the form.
-- **Refresh wall is the only action that requests the feed.** No fetch on load, settings save, timer, focus, or display-mode entry. Reloading a live wall starts empty until Refresh wall is pressed. Feed failures preserve the currently displayed profiles.
-- Refresh reflects approvals, edits, and removals; repeated refreshes do not append duplicates. Changing feeds clears the previous feed's profiles and cancels its pending request.
-- Display mode shows four profiles per page (two on smaller screens), rotating every 12 seconds. Pause/Resume and Exit buttons. It cycles the current data only. Reduced-motion preference pauses rotation initially.
-
-## Stored submissions and admin board
-
-The built-in form can now store profiles through an omg.dev backend, with a password-protected admin board for Pending, Published and Archived cards. Admins can edit details, feature profiles, publish, archive, restore, or permanently delete with explicit confirmation. Profile visibility on the public wall remains manual-refresh only. See [DEPLOY-OMG.md](DEPLOY-OMG.md) for deployment, storage, authentication and the current hosting-login blocker.
-
-**Avatar studio** uses the actual [Avatartion](https://github.com/wilmerterrero/Avatartion) artwork: face, hair, eyes, mouth, outfit, accessories, facial hair and backgrounds, with shuffle and SVG download. The original MIT license is included in `vendor/avatartion/LICENSE.txt`.
-
-## Optional Google Form → Google Sheet → Refresh wall
-
-The previous Google Sheets input remains available as an alternative to the omg.dev backend. Google Forms writes to the response Sheet; Apps Script exposes approved rows as JSON when the organizer clicks Refresh wall.
-
-1. Create a Google Form. Add these question titles **exactly**, then connect its Responses tab to a Google Sheet:
-
-| Question title | Type / choices |
-| --- | --- |
-| Your name | Short answer; required; max 60 characters |
-| Your course | Short answer; required; max 80 characters |
-| Curriculum group | Dropdown: Arts & Design, Business, Engineering, Science, Other |
-| Year of study | Dropdown: Year 1, Year 2, Year 3, Year 4+, Postgraduate |
-| I am | Paragraph; required; max 180 characters |
-| I can help with | Paragraph; required; max 140 characters |
-| I want to meet | Paragraph; required; max 140 characters |
-| Find me at | Optional short answer: Instagram handle only (with or without @) |
-| Avatar | Optional dropdown, 1–16; see `avatar-picker.html` for the numbered illustrations |
-| Consent | Required checkbox with exactly one choice: I agree |
-
-Add description to Consent: “I’m happy for these answers and my Instagram handle to be shown on the hall wall.” Do not include private details such as room numbers in the form. The feed is publicly readable, so only consented, approved profile fields should be included. Optional collected emails remain private and are never returned by this script.
-
-2. In the **response Sheet**, add an `Approved` column at the end and use Insert → Checkbox on its data cells. Only checked rows with consent will be shown. New rows start unapproved. Google Forms supplies the `Timestamp` column; if your Google account uses another language, rename that column to `Timestamp`.
-3. In that Sheet, open **Extensions → Apps Script**. Paste `google-apps-script.gs`. Change `RESPONSE_SHEET_NAME` to your exact response-tab name (e.g. `Form Responses 1`).
-4. **Deploy → New deployment → Web app**. Execute as **Me**, access **Anyone**. Authorize your script and copy the deployed URL ending in `/exec`. If your university disables anonymous web apps, this setup needs an approved hosting/authentication alternative; do not publish the whole response Sheet as a workaround.
-5. Open the wall’s **Wall setup**. Add your hall name, the Google Form’s responder link, and the Apps Script URL. Save. Press **Refresh wall** to load the approved profiles.
-6. To make these settings the default for all visitors, put the same three values into `config.json`, rebuild, and host the new `dist/index.html`. Setup settings saved in a browser override these defaults for that browser only.
-
-New entries and edits remain in Sheets until you click Refresh wall. Unchecking Approved removes the profile on the next successful refresh. A disconnected screen keeps its current wall until a refresh succeeds. Do not collect sensitive details: the public feed and wall are meant only for introductions residents agree to share.
-
-**What still needs your real setup:** a hall name, a Google Form/response Sheet, and deployment of the included Apps Script in your Google account. No Google account resources are created by this repository. Live Google connectivity requires those real URLs and should be checked from the hosted wall, including a test submission, approval, and refresh. The transcript's isolated interactive preview cannot access external feeds; download/host the built HTML for Google integration.
-
-## Verification
-
-```sh
+npm run build:pages
 npm test
+SITE_URL=https://thisisan.github.io/common-ground-hall/ node scripts/check-live.mjs
 ```
 
-Browser coverage checks manual-only fetching, approval updates/removals, failure retention, no duplicates, search, form validation/persistence, responsive layout, keyboard dialogs, and display rotation. Apps Script is tested using a mocked Sheet/ContentService to check that only approved, consented fields are exposed. This does not substitute for a real Google deployment smoke test.
+GitHub Pages serves `docs/` on `main`. Publish the reviewed source and regenerated `docs/` to `thisisan/common-ground-hall`. `npm start` serves the local `dist/` build on port 4173.
 
-## Assets and references
+## Backend and analytics status
 
-- Notionists by Zoish, via [DiceBear](https://www.dicebear.com/styles/notionists/), CC0 1.0. Sixteen unmodified generated illustrations are bundled in `assets/avatars.json`; regenerate with `node scripts/avatars.mjs`. Not affiliated with Notion.
-- Manrope font: SIL Open Font License, included in `assets/Manrope-OFL.txt`. The Latin variable font is bundled; other scripts use the system fallback.
-- QR codes generated locally with `qrcode` (MIT).
-- [Google Apps Script web apps](https://developers.google.com/apps-script/guides/web) and [JSON Content Service](https://developers.google.com/apps-script/guides/content).
+The live site currently serves the reviewed snapshot. It does not collect visitor analytics. omg.dev deployment requires restoring the hosting account connection, which currently returns `Session refresh failed (400): session not found`.
 
-The public wall retains its minimalist layout with subtle Skyers blue and cyan accents. Create avatar, Display mode, Join the wall, and the related avatar/join shortcuts are temporarily hidden. Their components remain available in the code for future reactivation.
+Backend/admin modules remain in the repository for the next deployment, but are not connected to the public wall. The intended backend will allow only hall staff to upload/manage profiles and will provide aggregate visits, page views, referral sources, profile opens and contact interactions. The removed public join, avatar and setup tools are not part of the visitor interface.
+
+## Assets
+
+The Manrope font is bundled under its SIL Open Font License (`assets/Manrope-OFL.txt`). Existing optional avatar assets retain their upstream notices: Notionists by Zoish via DiceBear (CC0), and Avatartion by Wilmer Terrero (MIT, `vendor/avatartion/LICENSE.txt`). The site is not affiliated with Notion.

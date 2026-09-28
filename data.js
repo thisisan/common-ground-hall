@@ -1,6 +1,6 @@
 import { cleanAvatar } from './avatar-schema.js';
 import { cleanSocials, legacyMirror } from './social-schema.js';
-export const categories = ['Arts & Design', 'Business', 'Engineering', 'Science', 'Medic', 'Law', 'Other'];
+export const categories = ['Arts & Design', 'Business', 'Engineering', 'Science', 'Medic', 'Law', 'Others'];
 export const sampleProfiles = [
   { id: 'demo-1', name: 'Alex Chan', curriculum: 'Architecture', category: 'Arts & Design', year: 'Year 2', intro: 'Sketchbook always in hand. Usually hunting down the best milk tea.', help: 'Sketching, Adobe tools & late-night model making.', meet: 'Creative souls and weekend café explorers.', socials: [{ platform: 'instagram', value: 'alex.sketches' }, { platform: 'xhs', value: 'https://www.xiaohongshu.com/user/profile/5f2a1b3c' }], avatar: 0 },
   { id: 'demo-2', name: 'Sophie Wong', curriculum: 'Business Administration', category: 'Business', year: 'Year 1', intro: 'New to hall life. Big on good food and even better conversations.', help: 'Presentations, baking & finding a good deal.', meet: 'Dinner buddies and people to try new things with.', handle: 'sophiew.jpg', avatar: 1 },
@@ -10,10 +10,10 @@ export const sampleProfiles = [
   { id: 'demo-6', name: 'Chloe Ng', curriculum: 'Visual Arts', category: 'Arts & Design', year: 'Year 3', intro: 'Collecting little moments on film. My room is basically a mini gallery.', help: 'Photography, poster design & creative projects.', meet: 'Art lovers, music people and fellow makers.', socials: [{ platform: 'instagram', value: 'chloe.onfilm' }, { platform: 'tiktok', value: 'chloe.onfilm' }, { platform: 'website', value: 'https://chloe-ng.example.com' }], avatar: 5 },
   { id: 'demo-7', name: 'Daniel Ho', curriculum: 'Economics & Finance', category: 'Business', year: 'Year 2', intro: 'Basketball after class, cooking after basketball. Come grab a plate.', help: 'Excel, meal prep & your free-throw technique.', meet: 'Pickup basketball players and kitchen companions.', handle: 'danielho', avatar: 6 },
   { id: 'demo-8', name: 'Tiffany Lam', curriculum: 'Biological Sciences', category: 'Science', year: 'Year 1', intro: 'Plant parent, animal lover, and your future karaoke duet partner.', help: 'Biology notes, plant care & a confidence boost.', meet: 'Study buddies and fellow karaoke enthusiasts.', handle: 'tiff.lam', avatar: 7 },
-  { id: 'demo-9', name: 'Jamie Yip', curriculum: 'English & Linguistics', category: 'Other', year: 'Year 4+', intro: 'Here for poetry, tiny gigs, and conversations that go past midnight.', help: 'Proofreading, public speaking & guitar chords.', meet: 'Writers, musicians and open-mic companions.', socials: [{ platform: 'instagram', value: 'jamie.words' }, { platform: 'x', value: 'jamiewords' }, { platform: 'youtube', value: 'https://www.youtube.com/@jamiewords' }], avatar: 8 },
+  { id: 'demo-9', name: 'Jamie Yip', curriculum: 'English & Linguistics', category: 'Others', year: 'Year 4+', intro: 'Here for poetry, tiny gigs, and conversations that go past midnight.', help: 'Proofreading, public speaking & guitar chords.', meet: 'Writers, musicians and open-mic companions.', socials: [{ platform: 'instagram', value: 'jamie.words' }, { platform: 'x', value: 'jamiewords' }, { platform: 'youtube', value: 'https://www.youtube.com/@jamiewords' }], avatar: 8 },
   { id: 'demo-10', name: 'Maya Patel', curriculum: 'Medicine', category: 'Science', year: 'Year 2', intro: 'Making time for yoga between lectures. I make a pretty great chai.', help: 'Study planning, biology & easy vegetarian meals.', meet: 'Yoga buddies and anyone missing home cooking.', handle: 'maya.p', avatar: 9 },
   { id: 'demo-11', name: 'Ethan Yu', curriculum: 'Civil Engineering', category: 'Engineering', year: 'Year 3', intro: 'A football fan who takes the scenic route everywhere.', help: 'Physics, travel planning & a five-a-side match.', meet: 'Football teammates and spontaneous explorers.', handle: 'ethanyu', avatar: 10 },
-  { id: 'demo-12', name: 'Olivia Cheng', curriculum: 'Law', category: 'Other', year: 'Postgraduate', intro: 'A puzzle person with a soft spot for old movies and spicy noodles.', help: 'Debate prep, essay structure & crossword clues.', meet: 'Film-night friends and board game regulars.', handle: 'olivia.cheng', avatar: 11 }
+  { id: 'demo-12', name: 'Olivia Cheng', curriculum: 'Law', category: 'Others', year: 'Postgraduate', intro: 'A puzzle person with a soft spot for old movies and spicy noodles.', help: 'Debate prep, essay structure & crossword clues.', meet: 'Film-night friends and board game regulars.', handle: 'olivia.cheng', avatar: 11 }
 ];
 
 export function normalizeProfiles(payload) {
@@ -28,7 +28,7 @@ export function normalizeProfiles(payload) {
     clean.id = String(profile.id || `row-${index}`).slice(0, 100);
     if (ids.has(clean.id)) throw new Error('The feed contains duplicate profile IDs.');
     ids.add(clean.id);
-    clean.category = categories.includes(profile.category) ? profile.category : 'Other';
+    clean.category = categories.includes(profile.category) ? profile.category : 'Others';
     clean.avatar = Number.isInteger(Number(profile.avatar)) && Number(profile.avatar) >= 0 ? Number(profile.avatar) % 16 : index % 16;
     // Feed data is untrusted: drop unparseable accounts instead of rejecting the row.
     clean.socials = cleanSocials(profile, { strict: false });

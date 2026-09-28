@@ -2,8 +2,8 @@
   {
     "id": "resident-1",
     "name": "Ethan",
-    "curriculum": "6303",
-    "category": "Other",
+    "curriculum": "Engineering Elite Programme",
+    "category": "Engineering",
     "year": "Year 1",
     "intro": "Sleep more than I should, trying to work harder.",
     "help": "Time, Making things, or other things.",
@@ -15,8 +15,8 @@
   {
     "id": "resident-2",
     "name": "Raven",
-    "curriculum": "6779",
-    "category": "Other",
+    "curriculum": "Statistical Decision Sciences",
+    "category": "Science",
     "year": "Year 1",
     "intro": "ENFP super extroverted",
     "help": "Singing  Playing Ball game",
@@ -33,7 +33,7 @@
   {
     "id": "resident-3",
     "name": "Héctor",
-    "curriculum": "Bachelor of biological sciences",
+    "curriculum": "Bachelor of Biological Sciences",
     "category": "Science",
     "year": "Year 4",
     "intro": "Gamer (video and board), animal lover, night owl, techno dancer, karaoke",
@@ -64,7 +64,7 @@
   {
     "id": "resident-5",
     "name": "Super Yello Duck",
-    "curriculum": "computer science",
+    "curriculum": "Computer Science",
     "category": "Engineering",
     "year": "Year 2",
     "intro": "Photographer",
@@ -109,7 +109,7 @@
     "id": "resident-8",
     "name": "Valentin",
     "curriculum": "International Relations",
-    "category": "Other",
+    "category": "Others",
     "year": "Postgraduate",
     "intro": "Very outgoing, down for everything",
     "help": "Having lived in several countries and good vibes. Sport enthousiast :)",
@@ -147,8 +147,8 @@
   {
     "id": "resident-11",
     "name": "Peter",
-    "curriculum": "Philosophy/History",
-    "category": "Other",
+    "curriculum": "Philosophy / History",
+    "category": "Others",
     "year": "Year 2",
     "intro": "Moviegoer/ Traver lover/ Hiking enthusiast",
     "help": "Lunch/Movie/Hiking/Travel companion/ Board games/ Movie/Book/TV show recommendations",
@@ -173,7 +173,7 @@
   {
     "id": "resident-13",
     "name": "Derek",
-    "curriculum": "BSc mathematics",
+    "curriculum": "BSc Mathematics",
     "category": "Science",
     "year": "Year 1",
     "intro": "Easygoing, Intelligent, Kind, Musician, ESTJ",
@@ -352,5 +352,49 @@
       }
     ],
     "avatar": 6
+  },
+  {
+    "id": "resident-24",
+    "name": "Will",
+    "curriculum": "BASc (Applied AI)",
+    "category": "Engineering",
+    "year": "Year 1",
+    "intro": "Gamer\nHooper\nSleeper\nEater\nWeak and thin gym bro\nCat person cat owner",
+    "help": "Laser engraving / tips on engineering as 2nd major / related minor\nBasketball / volleyball\nDelta force 三角洲行动 手游\nCantonese practice can somebody teach me Cantonese",
+    "meet": "People who enjoy music\nCantonese teachers\n三角洲手游组排\nShenzhen weekend eating buddies\nBasketball hoopers",
+    "contact": "Instagram/WeChat: lswill2007 *\"el\" for the first letter, not \"1\"!",
+    "socials": [],
+    "avatar": 7
+  },
+  {
+    "id": "resident-25",
+    "name": "Esper",
+    "curriculum": "Engineering",
+    "category": "Engineering",
+    "year": "Year 2",
+    "intro": "Football lover / Travel lover / Gym Beginner / Gamer / INFJ",
+    "help": "Guitar tutorials / Travel / Computer trouble shooting / Music",
+    "meet": "Study buddies / Language-exchange partners / Gym bros / Football lover / AI expert",
+    "contact": "Instagram: espersze / WeChat: Esperaaa",
+    "socials": [
+      {
+        "platform": "instagram",
+        "value": "espersze"
+      }
+    ],
+    "avatar": 8
+  },
+  {
+    "id": "resident-26",
+    "name": "Daisy",
+    "curriculum": "Engineering",
+    "category": "Engineering",
+    "year": "Year 1",
+    "intro": "ENFP, extroverted, Night owl",
+    "help": "Book companion, Basketball lover, Lunch companion, English and Cantonese learner",
+    "meet": "Study buddies, Basketball players, people who enjoy meaningful conversations, people who are good at English and Cantonese",
+    "contact": "（86）13691026233",
+    "socials": [],
+    "avatar": 9
   }
 ]

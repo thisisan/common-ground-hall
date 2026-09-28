@@ -1,3 +1,11 @@
+# Deployment status — September 28, 2026
+
+The live GitHub site now serves 26 reviewed profiles. It is read-only: student uploads, setup and admin controls have been removed from its visitor UI. No analytics are active. omg.dev account lookup returns `Session refresh failed (400): session not found`.
+
+The instructions below describe the previous backend prototype and must not be used as-is: public submission must be restricted to authenticated staff, imported photos and full contact fields must be preserved, the new admin interface must be connected, and tracking must be verified before deployment.
+
+---
+
 # omg.dev backend deployment
 
 The public wall stays at https://thisisan.github.io/common-ground-hall/. The same frontend plus a persistent SQLite API deploys to omg.dev. Public form submissions wait in Pending. Only server-authenticated admins can publish, edit, feature, archive, restore, or permanently delete profiles.
